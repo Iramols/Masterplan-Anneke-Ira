@@ -45,9 +45,10 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v12)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v13)</button>
     <nav class="nav">
-      <button class="nav-btn active" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
+      <button class="nav-btn active" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
+      <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
       <button class="nav-btn" data-view="masterplan" onclick="gaNaar('masterplan')">Masterplan</button>
       <button class="nav-btn" data-view="deelplannen" onclick="gaNaar('deelplannen')">Deelplannen</button>
       <button class="nav-btn" data-view="acties" onclick="gaNaar('acties')">Acties</button>
@@ -57,8 +58,16 @@
 
   <main class="main">
 
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="card">
+        <div class="card-title">Dashboard</div>
+        <div class="card-sub">Overzicht komt hier.</div>
+      </div>
+    </section>
+
     <!-- EINDDOEL -->
-    <section class="view active" id="view-einddoel">
+    <section class="view" id="view-einddoel">
       <div class="card">
         <div class="card-title">Ons einddoel</div>
         <div class="card-sub">Waar staan we over een aantal jaar? Beschrijf het eindbeeld van het bedrijf.</div>
@@ -145,8 +154,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=12"></script>
-<script src="js/auth.js?v=12"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/supabase-config.js?v=13"></script>
+<script src="js/auth.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
 </body>
 </html>

@@ -50,6 +50,9 @@ function vraagNaamOpEenmalig() {
 
 async function doLogout() {
   try { await getSupabase().auth.signOut(); } catch (e) {}
+  // Bij opnieuw inloggen altijd op het Dashboard starten, niet in het
+  // laatst bekeken tabblad (dat is alleen voor de Ververs-knop).
+  try { sessionStorage.removeItem('masterplan_tab'); } catch (e) {}
   location.reload();
 }
 
