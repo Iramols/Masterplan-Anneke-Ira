@@ -13,6 +13,10 @@ let state = {
 // SVG i.p.v. emoji: een 🗑️-emoji rendert op sommige systemen amper zichtbaar
 // zonder kleur-emoji-lettertype. Dit icoon werkt overal hetzelfde.
 const ICOON_PRULLENBAK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+const ICOON_POTLOOD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
+// Id van de actie die nu inline bewerkt wordt (null = geen enkele).
+let bewerkActieId = null;
 
 function nieuwId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
@@ -158,7 +162,7 @@ function renderActies() {
     const d = (state.deelplannen.items || []).find(x => x.id === id);
     return d ? d.titel : '';
   };
-  lijst.innerHTML = items.map(a => `
+  lijst.innerHTML = items.map(a => a.id === bewerkActieId ? bewerkActieRijHtml(a) : `
     <div class="actie-row">
       <input type="checkbox" class="actie-check" ${a.status === 'klaar' ? 'checked' : ''} onchange="toggleActie('${a.id}')">
       <div>
@@ -168,9 +172,54 @@ function renderActies() {
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
       <span class="actie-wie">${escapeHtml(a.wie || 'Samen')}</span>
+      <button class="actie-del" onclick="bewerkActie('${a.id}')" title="Bewerken">${ICOON_POTLOOD}</button>
       <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
     </div>
   `).join('');
+}
+function deelplanOptiesHtml(geselecteerdId) {
+  const items = state.deelplannen.items || [];
+  return '<option value="">(geen deelplan)</option>' +
+    items.map(d => `<option value="${d.id}" ${d.id === geselecteerdId ? 'selected' : ''}>${escapeHtml(d.titel)}</option>`).join('');
+}
+// Zelfde velden/volgorde als de invoerregel voor een nieuwe actie, zodat
+// bewerken er vertrouwd uitziet.
+function bewerkActieRijHtml(a) {
+  return `
+    <div class="add-row" style="flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--sand-dark)">
+      <input id="ae-tekst-${a.id}" value="${escapeHtml(a.tekst)}" style="flex:1 1 220px">
+      <select id="ae-status-${a.id}" style="flex:0 0 110px">
+        <option value="te-doen" ${a.status === 'te-doen' ? 'selected' : ''}>Te doen</option>
+        <option value="bezig" ${a.status === 'bezig' ? 'selected' : ''}>Bezig</option>
+        <option value="klaar" ${a.status === 'klaar' ? 'selected' : ''}>Klaar</option>
+      </select>
+      <select id="ae-wie-${a.id}" style="flex:0 0 110px">
+        <option value="Samen" ${a.wie === 'Samen' ? 'selected' : ''}>Samen</option>
+        <option value="Ira" ${a.wie === 'Ira' ? 'selected' : ''}>Ira</option>
+        <option value="Anneke" ${a.wie === 'Anneke' ? 'selected' : ''}>Anneke</option>
+      </select>
+      <select id="ae-deelplan-${a.id}" style="flex:0 0 160px">${deelplanOptiesHtml(a.deelplanId)}</select>
+      <input id="ae-datum-${a.id}" type="date" value="${a.datum || ''}" style="flex:0 0 150px">
+      <button class="btn-sm" onclick="slaOpBewerkteActie('${a.id}')">Opslaan</button>
+      <button class="btn-sm" onclick="annuleerBewerkActie()">Annuleren</button>
+    </div>
+  `;
+}
+function bewerkActie(id) { bewerkActieId = id; renderActies(); }
+function annuleerBewerkActie() { bewerkActieId = null; renderActies(); }
+async function slaOpBewerkteActie(id) {
+  const a = (state.acties.items || []).find(x => x.id === id);
+  if (!a) return;
+  const tekst = document.getElementById('ae-tekst-' + id).value.trim();
+  if (!tekst) return;
+  a.tekst = tekst;
+  a.status = document.getElementById('ae-status-' + id).value;
+  a.wie = document.getElementById('ae-wie-' + id).value;
+  a.deelplanId = document.getElementById('ae-deelplan-' + id).value || null;
+  a.datum = document.getElementById('ae-datum-' + id).value || null;
+  await bewaarData('acties', state.acties);
+  bewerkActieId = null;
+  renderActies();
 }
 function formatDatum(iso) {
   const d = new Date(iso + 'T00:00:00');
