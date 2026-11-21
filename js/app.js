@@ -3,6 +3,13 @@
 // Vier keys: einddoel, masterplan, deelplannen, acties. Simpele JSON-blobs i.p.v.
 // losse tabellen per onderdeel -- makkelijk aan te passen zolang de opzet nog niet vaststaat.
 
+// Haalt gegarandeerd de laatste versie op: een nieuwe, nog nooit gecachete
+// URL (met een unieke querystring) omzeilt zowel de browsercache als een
+// eventueel nog niet verlopen CDN-cache van GitHub Pages.
+function verversNu() {
+  location.href = location.pathname + '?r=' + Date.now();
+}
+
 let state = {
   einddoel: { tekst: '' },
   masterplan: { fases: [] },
@@ -143,6 +150,11 @@ async function verwijderDeelplan(id) {
 const STATUS_VOLGORDE = ['te-doen', 'bezig', 'klaar'];
 const STATUS_LABEL = { 'te-doen': 'Te doen', 'bezig': 'Bezig', 'klaar': 'Klaar' };
 
+// a.tekst is de oude, ongesplitste opslag (vóór de titel/details-splitsing)
+// -- als fallback getoond als titel zodat bestaande acties niet verdwijnen.
+function actieTitel(a) { return a.titel || a.tekst || ''; }
+function actieDetails(a) { return a.details || ''; }
+
 function renderActies() {
   const lijst = document.getElementById('actie-lijst');
   const items = state.acties.items || [];
@@ -151,7 +163,8 @@ function renderActies() {
     <div class="actie-row">
       <input type="checkbox" class="actie-check" ${a.status === 'klaar' ? 'checked' : ''} onchange="toggleActie('${a.id}')">
       <div class="actie-tekst-kol">
-        <div class="actie-tekst ${a.status === 'klaar' ? 'klaar' : ''}">${escapeHtml(a.tekst)}</div>
+        <div class="actie-tekst ${a.status === 'klaar' ? 'klaar' : ''}">${escapeHtml(actieTitel(a))}</div>
+        ${actieDetails(a) ? `<div class="actie-details">${escapeHtml(actieDetails(a))}</div>` : ''}
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
       <span class="actie-wie">${escapeHtml(a.wie || 'Samen')}</span>
@@ -170,7 +183,8 @@ function bewerkActieRijHtml(a) {
     <div class="add-row">
       <span class="col-check"></span>
       <div class="actie-tekst-kol">
-        <textarea id="ae-tekst-${a.id}" class="actie-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escapeHtml(a.tekst)}</textarea>
+        <input id="ae-titel-${a.id}" class="actie-titel-input" value="${escapeHtml(actieTitel(a))}">
+        <textarea id="ae-details-${a.id}" class="actie-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escapeHtml(actieDetails(a))}</textarea>
       </div>
       <select id="ae-status-${a.id}" class="col-status">
         <option value="te-doen" ${a.status === 'te-doen' ? 'selected' : ''}>Te doen</option>
@@ -191,16 +205,18 @@ function bewerkActieRijHtml(a) {
 function bewerkActie(id) {
   bewerkActieId = id;
   renderActies();
-  const veld = document.getElementById('ae-tekst-' + id);
+  const veld = document.getElementById('ae-details-' + id);
   if (veld) { veld.style.height = 'auto'; veld.style.height = veld.scrollHeight + 'px'; }
 }
 function annuleerBewerkActie() { bewerkActieId = null; renderActies(); }
 async function slaOpBewerkteActie(id) {
   const a = (state.acties.items || []).find(x => x.id === id);
   if (!a) return;
-  const tekst = document.getElementById('ae-tekst-' + id).value.trim();
-  if (!tekst) return;
-  a.tekst = tekst;
+  const titel = document.getElementById('ae-titel-' + id).value.trim();
+  if (!titel) return;
+  a.titel = titel;
+  a.details = document.getElementById('ae-details-' + id).value.trim();
+  delete a.tekst;
   a.status = document.getElementById('ae-status-' + id).value;
   a.wie = document.getElementById('ae-wie-' + id).value;
   a.datum = document.getElementById('ae-datum-' + id).value || null;
@@ -217,17 +233,19 @@ function isOverdue(a) {
   return a.datum < new Date().toISOString().slice(0, 10);
 }
 async function voegActieToe() {
-  const tekst = document.getElementById('actie-tekst').value.trim();
+  const titel = document.getElementById('actie-titel').value.trim();
+  const details = document.getElementById('actie-details').value.trim();
   const status = document.getElementById('actie-status').value;
   const wie = document.getElementById('actie-wie').value;
   const datum = document.getElementById('actie-datum').value;
-  if (!tekst) return;
+  if (!titel) return;
   state.acties.items = state.acties.items || [];
-  state.acties.items.push({ id: nieuwId(), tekst, status, wie, datum: datum || null });
+  state.acties.items.push({ id: nieuwId(), titel, details, status, wie, datum: datum || null });
   await bewaarData('acties', state.acties);
-  const tekstVeld = document.getElementById('actie-tekst');
-  tekstVeld.value = '';
-  tekstVeld.style.height = 'auto';
+  document.getElementById('actie-titel').value = '';
+  const detailsVeld = document.getElementById('actie-details');
+  detailsVeld.value = '';
+  detailsVeld.style.height = 'auto';
   document.getElementById('actie-status').value = 'te-doen';
   document.getElementById('actie-datum').value = '';
   renderActies();

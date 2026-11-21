@@ -44,6 +44,7 @@
 <div id="app-shell" style="display:none">
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
       <button class="nav-btn" data-view="masterplan" onclick="gaNaar('masterplan')">Masterplan</button>
@@ -121,7 +122,8 @@
         <div class="add-row">
           <span class="col-check"></span>
           <div class="actie-tekst-kol">
-            <textarea id="actie-tekst" class="actie-input" rows="1" placeholder="Nieuwe actie... (Enter voor een nieuwe regel)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <input id="actie-titel" class="actie-titel-input" placeholder="Actie...">
+            <textarea id="actie-details" class="actie-input" rows="1" placeholder="Details (optioneel, Enter voor een nieuwe regel)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
           </div>
           <select id="actie-status" class="col-status">
             <option value="te-doen">Te doen</option>
@@ -142,8 +144,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=8"></script>
-<script src="js/auth.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/supabase-config.js?v=10"></script>
+<script src="js/auth.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>

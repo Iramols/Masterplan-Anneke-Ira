@@ -52,6 +52,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .btn-sm { background: var(--sage-light); color: var(--sage); border: 1px solid var(--sage-mid); padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
 .btn-sm:hover { background: var(--sage-mid); }
 .btn-danger { background: var(--accent-light, #f5e8df); color: #c0392b; border: 1px solid #e0b4ae; }
+.btn-ververs { background: #c0392b; color: var(--white); border: none; padding: 9px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+.btn-ververs:hover { background: #a93226; }
 
 /* ===== APP SHELL ===== */
 .header { background: var(--white); border-bottom: 1px solid var(--sand-dark); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -96,6 +98,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .actie-tekst-kol { flex: 1 1 220px; min-width: 220px; }
 .actie-tekst { font-size: 14px; overflow-wrap: break-word; white-space: pre-wrap; }
 .actie-tekst.klaar { text-decoration: line-through; color: var(--muted); }
+.actie-details { font-size: 13px; color: var(--muted); overflow-wrap: break-word; white-space: pre-wrap; margin-top: 2px; }
 .actie-badge { flex: 0 0 var(--col-status); font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px; text-align: center; align-self: center; }
 .actie-badge.te-doen { background: #fbe4e1; color: var(--status-todo); }
 .actie-badge.bezig { background: #f5e8df; color: var(--status-bezig); }
@@ -107,7 +110,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .actie-del:hover { opacity: 1; color: #c0392b; }
 
 .add-row { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-.add-row textarea.actie-input { width: 100%; min-height: 40px; padding: 9px 12px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); resize: vertical; outline: none; }
+.actie-titel-input { width: 100%; padding: 9px 12px; margin-bottom: 6px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); outline: none; }
+.actie-titel-input:focus { border-color: var(--sage); }
+.add-row textarea.actie-input { width: 100%; min-height: 36px; padding: 8px 12px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); resize: vertical; outline: none; }
 .add-row textarea.actie-input:focus { border-color: var(--sage); }
 .add-row select, .add-row input[type="date"] { padding: 9px 10px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--charcoal); background: var(--white); }
 .add-row .btn-sm { flex: 0 0 auto; }
