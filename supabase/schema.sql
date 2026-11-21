@@ -26,6 +26,13 @@ create policy "masterplan_data: ingelogd voegt toe" on masterplan_data
 create policy "masterplan_data: ingelogd werkt bij" on masterplan_data
   for update using (auth.uid() is not null);
 
+-- RLS-policies bepalen WELKE rijen een rol mag zien/wijzigen, maar de rol
+-- heeft ook simpelweg het basisrecht (GRANT) nodig om INSERT/UPDATE/DELETE
+-- op de tabel uit te mogen voeren -- zonder dit geeft Postgres "permission
+-- denied for table" nog vóór de policies iets bekijken.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on table masterplan_data to authenticated;
+
 -- ========== Het gedeelde account aanmaken ==========
 -- Supabase dashboard -> Authentication -> Add user:
 --   masterplan@masterplan.local   (of jullie eigen echte e-mailadres)
