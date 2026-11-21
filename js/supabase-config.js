@@ -1,7 +1,6 @@
-// Vul dit in zodra het nieuwe (3e, aparte) Supabase-project is aangemaakt:
-// Project Settings -> API -> Project URL en anon public key.
-const SUPABASE_URL = 'VUL_HIER_DE_PROJECT_URL_IN';
-const SUPABASE_ANON_KEY = 'VUL_HIER_DE_ANON_KEY_IN';
+// Project Settings -> API: Project URL en publishable key.
+const SUPABASE_URL = 'https://rzgslvnncrvcshgacrow.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_lR6rV_XjJcq-fC77KPKw0A_dNQ8JsyU';
 
 let _sb = null;
 function getSupabase() {
