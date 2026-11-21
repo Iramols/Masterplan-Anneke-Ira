@@ -87,7 +87,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .actie-badge.bezig { background: #f5e8df; color: var(--status-bezig); }
 .actie-badge.klaar { background: var(--sage-light); color: var(--sage); }
 .actie-wie { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; }
-.actie-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; opacity: 0.5; }
+.actie-del { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; padding: 4px; opacity: 0.6; }
 .actie-del:hover { opacity: 1; color: #c0392b; }
 
 .add-row { display: flex; gap: 8px; margin-top: 14px; }
