@@ -1,6 +1,8 @@
 // ========== INLOGGEN / UITLOGGEN ==========
-// Simpel: twee accounts (Ira & Anneke), geen rollen, allebei zien/bewerken
-// dezelfde masterplan-data. Zie supabase/schema.sql voor de tabel + policies.
+// Eén gedeeld account voor Ira en Anneke samen. Zie supabase/schema.sql
+// voor de tabel + policies. Om wijzigingen toch aan een naam te kunnen
+// koppelen, wordt na het inloggen eenmalig (per toestel) gevraagd wie er
+// nu gebruikmaakt van de site -- zie vraagNaamOpEenmalig() hieronder.
 
 function toLoginEmail(input) {
   input = (input || '').trim();
@@ -34,6 +36,18 @@ async function doLogin() {
   }
 }
 
+// Eén gedeeld account, dus de site weet zelf niet wie erachter zit --
+// daarom eenmalig per toestel (localStorage) vragen, puur om wijzigingen
+// een naam te kunnen geven (bijv. bij het einddoel).
+function vraagNaamOpEenmalig() {
+  let naam = localStorage.getItem('masterplan_naam');
+  if (naam) return naam;
+  const invoer = (prompt('Wie ben jij? Typ "Ira" of "Anneke"') || '').trim();
+  naam = invoer ? invoer.charAt(0).toUpperCase() + invoer.slice(1).toLowerCase() : 'Onbekend';
+  localStorage.setItem('masterplan_naam', naam);
+  return naam;
+}
+
 async function doLogout() {
   try { await getSupabase().auth.signOut(); } catch (e) {}
   location.reload();
@@ -45,8 +59,7 @@ async function resolveSession() {
   const session = data && data.session;
   if (!session) { showLogin(); return; }
   window.loggedInEmail = session.user.email || '';
-  window.loggedInNaam = loggedInEmail.toLowerCase().indexOf('anneke') === 0 ? 'Anneke'
-    : loggedInEmail.toLowerCase().indexOf('ira') === 0 ? 'Ira' : loggedInEmail;
+  window.loggedInNaam = vraagNaamOpEenmalig();
   hideLogin();
   document.getElementById('app-shell').style.display = '';
   document.getElementById('boot-loader').style.display = 'none';

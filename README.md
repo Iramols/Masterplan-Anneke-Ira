@@ -6,7 +6,7 @@ Private planningssite voor het opzetten van het leefstijlbedrijf: einddoel, lang
 
 1. Maak een nieuw, apart Supabase-project aan op [supabase.com](https://supabase.com) (gratis tier).
 2. Open de SQL Editor en voer [`supabase/schema.sql`](supabase/schema.sql) uit.
-3. Maak de twee accounts aan via Authentication -> Add user (zie onderaan `schema.sql`).
+3. Maak het gedeelde account aan via Authentication -> Add user (zie onderaan `schema.sql`).
 4. Vul in [`js/supabase-config.js`](js/supabase-config.js) de Project URL en anon public key in (Project Settings -> API).
 5. Publiceer via GitHub Pages (Settings -> Pages -> Deploy from branch -> main / root).
 
