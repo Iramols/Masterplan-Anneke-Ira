@@ -44,7 +44,6 @@ async function initApp() {
   renderMasterplan();
   renderDeelplannen();
   renderActies();
-  vulDeelplanDropdown();
 }
 
 function gaNaar(view) {
@@ -123,7 +122,6 @@ function renderDeelplannen() {
       ${d.omschrijving ? `<div class="item-tekst">${escapeHtml(d.omschrijving)}</div>` : ''}
     </div>
   `).join('');
-  vulDeelplanDropdown();
 }
 async function voegDeelplanToe() {
   const titel = document.getElementById('deelplan-titel').value.trim();
@@ -141,15 +139,6 @@ async function verwijderDeelplan(id) {
   await bewaarData('deelplannen', state.deelplannen);
   renderDeelplannen();
 }
-function vulDeelplanDropdown() {
-  const sel = document.getElementById('actie-deelplan');
-  const huidig = sel.value;
-  const items = state.deelplannen.items || [];
-  sel.innerHTML = '<option value="">(geen deelplan)</option>' +
-    items.map(d => `<option value="${d.id}">${escapeHtml(d.titel)}</option>`).join('');
-  sel.value = huidig;
-}
-
 // ===== ACTIES =====
 const STATUS_VOLGORDE = ['te-doen', 'bezig', 'klaar'];
 const STATUS_LABEL = { 'te-doen': 'Te doen', 'bezig': 'Bezig', 'klaar': 'Klaar' };
@@ -158,16 +147,11 @@ function renderActies() {
   const lijst = document.getElementById('actie-lijst');
   const items = state.acties.items || [];
   document.getElementById('actie-leeg').style.display = items.length ? 'none' : '';
-  const deelplanNaam = id => {
-    const d = (state.deelplannen.items || []).find(x => x.id === id);
-    return d ? d.titel : '';
-  };
   lijst.innerHTML = items.map(a => a.id === bewerkActieId ? bewerkActieRijHtml(a) : `
     <div class="actie-row">
       <input type="checkbox" class="actie-check" ${a.status === 'klaar' ? 'checked' : ''} onchange="toggleActie('${a.id}')">
       <div>
         <div class="actie-tekst ${a.status === 'klaar' ? 'klaar' : ''}">${escapeHtml(a.tekst)}</div>
-        ${a.deelplanId ? `<div class="card-sub" style="margin:2px 0 0">${escapeHtml(deelplanNaam(a.deelplanId))}</div>` : ''}
         ${a.datum ? `<div class="card-sub" style="margin:2px 0 0${isOverdue(a) ? ';color:#c0392b;font-weight:600' : ''}">${formatDatum(a.datum)}</div>` : ''}
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
@@ -176,11 +160,6 @@ function renderActies() {
       <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
     </div>
   `).join('');
-}
-function deelplanOptiesHtml(geselecteerdId) {
-  const items = state.deelplannen.items || [];
-  return '<option value="">(geen deelplan)</option>' +
-    items.map(d => `<option value="${d.id}" ${d.id === geselecteerdId ? 'selected' : ''}>${escapeHtml(d.titel)}</option>`).join('');
 }
 // Zelfde velden/volgorde als de invoerregel voor een nieuwe actie, zodat
 // bewerken er vertrouwd uitziet.
@@ -198,7 +177,6 @@ function bewerkActieRijHtml(a) {
         <option value="Ira" ${a.wie === 'Ira' ? 'selected' : ''}>Ira</option>
         <option value="Anneke" ${a.wie === 'Anneke' ? 'selected' : ''}>Anneke</option>
       </select>
-      <select id="ae-deelplan-${a.id}" style="flex:0 0 160px">${deelplanOptiesHtml(a.deelplanId)}</select>
       <input id="ae-datum-${a.id}" type="date" value="${a.datum || ''}" style="flex:0 0 150px">
       <button class="btn-sm" onclick="slaOpBewerkteActie('${a.id}')">Opslaan</button>
       <button class="btn-sm" onclick="annuleerBewerkActie()">Annuleren</button>
@@ -215,7 +193,6 @@ async function slaOpBewerkteActie(id) {
   a.tekst = tekst;
   a.status = document.getElementById('ae-status-' + id).value;
   a.wie = document.getElementById('ae-wie-' + id).value;
-  a.deelplanId = document.getElementById('ae-deelplan-' + id).value || null;
   a.datum = document.getElementById('ae-datum-' + id).value || null;
   await bewaarData('acties', state.acties);
   bewerkActieId = null;
@@ -233,11 +210,10 @@ async function voegActieToe() {
   const tekst = document.getElementById('actie-tekst').value.trim();
   const status = document.getElementById('actie-status').value;
   const wie = document.getElementById('actie-wie').value;
-  const deelplanId = document.getElementById('actie-deelplan').value;
   const datum = document.getElementById('actie-datum').value;
   if (!tekst) return;
   state.acties.items = state.acties.items || [];
-  state.acties.items.push({ id: nieuwId(), tekst, status, wie, deelplanId: deelplanId || null, datum: datum || null });
+  state.acties.items.push({ id: nieuwId(), tekst, status, wie, datum: datum || null });
   await bewaarData('acties', state.acties);
   document.getElementById('actie-tekst').value = '';
   document.getElementById('actie-status').value = 'te-doen';
