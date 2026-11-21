@@ -150,14 +150,16 @@ function renderActies() {
   lijst.innerHTML = items.map(a => a.id === bewerkActieId ? bewerkActieRijHtml(a) : `
     <div class="actie-row">
       <input type="checkbox" class="actie-check" ${a.status === 'klaar' ? 'checked' : ''} onchange="toggleActie('${a.id}')">
-      <div>
+      <div class="actie-tekst-kol">
         <div class="actie-tekst ${a.status === 'klaar' ? 'klaar' : ''}">${escapeHtml(a.tekst)}</div>
-        ${a.datum ? `<div class="card-sub" style="margin:2px 0 0${isOverdue(a) ? ';color:#c0392b;font-weight:600' : ''}">${formatDatum(a.datum)}</div>` : ''}
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
       <span class="actie-wie">${escapeHtml(a.wie || 'Samen')}</span>
-      <button class="actie-del" onclick="bewerkActie('${a.id}')" title="Bewerken">${ICOON_POTLOOD}</button>
-      <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
+      <span class="actie-datum-kol"${a.datum && isOverdue(a) ? ' style="color:#c0392b;font-weight:600"' : ''}>${a.datum ? formatDatum(a.datum) : ''}</span>
+      <span class="actie-iconen">
+        <button class="actie-del" onclick="bewerkActie('${a.id}')" title="Bewerken">${ICOON_POTLOOD}</button>
+        <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
+      </span>
     </div>
   `).join('');
 }
@@ -165,25 +167,33 @@ function renderActies() {
 // bewerken er vertrouwd uitziet.
 function bewerkActieRijHtml(a) {
   return `
-    <div class="add-row" style="flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--sand-dark)">
-      <input id="ae-tekst-${a.id}" value="${escapeHtml(a.tekst)}" style="flex:1 1 220px">
-      <select id="ae-status-${a.id}" style="flex:0 0 110px">
+    <div class="add-row">
+      <span class="col-check"></span>
+      <div class="actie-tekst-kol">
+        <textarea id="ae-tekst-${a.id}" class="actie-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escapeHtml(a.tekst)}</textarea>
+      </div>
+      <select id="ae-status-${a.id}" class="col-status">
         <option value="te-doen" ${a.status === 'te-doen' ? 'selected' : ''}>Te doen</option>
         <option value="bezig" ${a.status === 'bezig' ? 'selected' : ''}>Bezig</option>
         <option value="klaar" ${a.status === 'klaar' ? 'selected' : ''}>Klaar</option>
       </select>
-      <select id="ae-wie-${a.id}" style="flex:0 0 110px">
+      <select id="ae-wie-${a.id}" class="col-wie">
         <option value="Samen" ${a.wie === 'Samen' ? 'selected' : ''}>Samen</option>
         <option value="Ira" ${a.wie === 'Ira' ? 'selected' : ''}>Ira</option>
         <option value="Anneke" ${a.wie === 'Anneke' ? 'selected' : ''}>Anneke</option>
       </select>
-      <input id="ae-datum-${a.id}" type="date" value="${a.datum || ''}" style="flex:0 0 150px">
+      <input id="ae-datum-${a.id}" type="date" class="col-datum" value="${a.datum || ''}">
       <button class="btn-sm" onclick="slaOpBewerkteActie('${a.id}')">Opslaan</button>
       <button class="btn-sm" onclick="annuleerBewerkActie()">Annuleren</button>
     </div>
   `;
 }
-function bewerkActie(id) { bewerkActieId = id; renderActies(); }
+function bewerkActie(id) {
+  bewerkActieId = id;
+  renderActies();
+  const veld = document.getElementById('ae-tekst-' + id);
+  if (veld) { veld.style.height = 'auto'; veld.style.height = veld.scrollHeight + 'px'; }
+}
 function annuleerBewerkActie() { bewerkActieId = null; renderActies(); }
 async function slaOpBewerkteActie(id) {
   const a = (state.acties.items || []).find(x => x.id === id);
@@ -215,7 +225,9 @@ async function voegActieToe() {
   state.acties.items = state.acties.items || [];
   state.acties.items.push({ id: nieuwId(), tekst, status, wie, datum: datum || null });
   await bewaarData('acties', state.acties);
-  document.getElementById('actie-tekst').value = '';
+  const tekstVeld = document.getElementById('actie-tekst');
+  tekstVeld.value = '';
+  tekstVeld.style.height = 'auto';
   document.getElementById('actie-status').value = 'te-doen';
   document.getElementById('actie-datum').value = '';
   renderActies();

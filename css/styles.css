@@ -62,7 +62,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .nav-btn:hover { background: var(--sage-light); color: var(--sage); }
 .nav-btn.active { background: var(--sage); color: var(--white); }
 
-.main { max-width: 920px; margin: 0 auto; padding: 28px 20px 60px; }
+.main { width: 100%; padding: 28px 28px 60px; }
 .view { display: none; }
 .view.active { display: block; }
 
@@ -77,21 +77,46 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .fase-periode { font-size: 11px; color: var(--sage); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .item-tekst { font-size: 14px; color: var(--charcoal); white-space: pre-wrap; line-height: 1.5; }
 
-.actie-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand-dark); }
+/* Vaste kolombreedtes, hergebruikt door de kopbalk, elke actierij en de
+   invoer-/bewerkregel, zodat alles mooi uitlijnt. */
+:root {
+  --col-check: 26px;
+  --col-status: 120px;
+  --col-wie: 100px;
+  --col-datum: 150px;
+  --col-iconen: 64px;
+}
+
+.actie-kolomkoppen { display: flex; align-items: center; gap: 10px; padding: 0 0 10px; }
+.actie-kolomkoppen span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); }
+
+.actie-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand-dark); flex-wrap: wrap; }
 .actie-row:last-child { border-bottom: none; }
-.actie-check { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--sage); cursor: pointer; }
-.actie-tekst { flex: 1; font-size: 14px; }
+.actie-check { width: var(--col-check); height: 20px; flex-shrink: 0; accent-color: var(--sage); cursor: pointer; margin-top: 2px; }
+.actie-tekst-kol { flex: 1 1 220px; min-width: 220px; }
+.actie-tekst { font-size: 14px; overflow-wrap: break-word; white-space: pre-wrap; }
 .actie-tekst.klaar { text-decoration: line-through; color: var(--muted); }
-.actie-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px; }
+.actie-badge { flex: 0 0 var(--col-status); font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px; text-align: center; align-self: center; }
 .actie-badge.te-doen { background: #fbe4e1; color: var(--status-todo); }
 .actie-badge.bezig { background: #f5e8df; color: var(--status-bezig); }
 .actie-badge.klaar { background: var(--sage-light); color: var(--sage); }
-.actie-wie { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; }
+.actie-wie { flex: 0 0 var(--col-wie); font-size: 13px; color: var(--muted); align-self: center; }
+.actie-datum-kol { flex: 0 0 var(--col-datum); font-size: 13px; color: var(--muted); align-self: center; }
+.actie-iconen { flex: 0 0 var(--col-iconen); display: flex; gap: 6px; align-self: center; }
 .actie-del { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; padding: 4px; opacity: 0.6; }
 .actie-del:hover { opacity: 1; color: #c0392b; }
 
-.add-row { display: flex; gap: 8px; margin-top: 14px; }
-.add-row input, .add-row select { flex: 1; }
+.add-row { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.add-row textarea.actie-input { width: 100%; min-height: 40px; padding: 9px 12px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); resize: vertical; outline: none; }
+.add-row textarea.actie-input:focus { border-color: var(--sage); }
+.add-row select, .add-row input[type="date"] { padding: 9px 10px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--charcoal); background: var(--white); }
+.add-row .btn-sm { flex: 0 0 auto; }
+.add-row .col-status, .actie-kolomkoppen .col-status { flex: 0 0 var(--col-status); }
+.add-row .col-wie, .actie-kolomkoppen .col-wie { flex: 0 0 var(--col-wie); }
+.add-row .col-datum, .actie-kolomkoppen .col-datum { flex: 0 0 var(--col-datum); }
+.actie-kolomkoppen .col-check { flex: 0 0 var(--col-check); }
+.actie-kolomkoppen .col-tekst { flex: 1 1 auto; }
+.actie-kolomkoppen .col-iconen { flex: 0 0 var(--col-iconen); }
 
 .empty-hint { font-size: 13px; color: var(--muted); font-style: italic; padding: 10px 0; }
 

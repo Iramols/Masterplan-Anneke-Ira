@@ -108,21 +108,32 @@
       <div class="card">
         <div class="card-title">Acties</div>
         <div class="card-sub">Concrete stappen.</div>
+        <div class="actie-kolomkoppen">
+          <span class="col-check"></span>
+          <span class="col-tekst">Actie</span>
+          <span class="col-status">Status</span>
+          <span class="col-wie">Wie</span>
+          <span class="col-datum">Datum</span>
+          <span class="col-iconen"></span>
+        </div>
         <div id="actie-lijst"></div>
         <div class="empty-hint" id="actie-leeg" style="display:none">Nog geen acties toegevoegd.</div>
-        <div class="add-row" style="flex-wrap:wrap">
-          <input id="actie-tekst" placeholder="Nieuwe actie..." style="flex:1 1 220px">
-          <select id="actie-status" style="flex:0 0 110px">
+        <div class="add-row">
+          <span class="col-check"></span>
+          <div class="actie-tekst-kol">
+            <textarea id="actie-tekst" class="actie-input" rows="1" placeholder="Nieuwe actie... (Enter voor een nieuwe regel)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+          </div>
+          <select id="actie-status" class="col-status">
             <option value="te-doen">Te doen</option>
             <option value="bezig">Bezig</option>
             <option value="klaar">Klaar</option>
           </select>
-          <select id="actie-wie" style="flex:0 0 110px">
+          <select id="actie-wie" class="col-wie">
             <option value="Samen">Samen</option>
             <option value="Ira">Ira</option>
             <option value="Anneke">Anneke</option>
           </select>
-          <input id="actie-datum" type="date" style="flex:0 0 150px">
+          <input id="actie-datum" type="date" class="col-datum">
           <button class="btn-sm" onclick="voegActieToe()">+ Toevoegen</button>
         </div>
       </div>
@@ -131,8 +142,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=7"></script>
-<script src="js/auth.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/supabase-config.js?v=8"></script>
+<script src="js/auth.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>
