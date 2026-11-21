@@ -164,7 +164,7 @@ function renderActies() {
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
       <span class="actie-wie">${escapeHtml(a.wie || 'Samen')}</span>
-      <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">✕</button>
+      <button class="actie-del" onclick="verwijderActie('${a.id}')" title="Verwijderen">🗑️</button>
     </div>
   `).join('');
 }
