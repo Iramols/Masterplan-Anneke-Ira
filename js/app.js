@@ -160,6 +160,7 @@ function renderActies() {
       <div>
         <div class="actie-tekst ${a.status === 'klaar' ? 'klaar' : ''}">${escapeHtml(a.tekst)}</div>
         ${a.deelplanId ? `<div class="card-sub" style="margin:2px 0 0">${escapeHtml(deelplanNaam(a.deelplanId))}</div>` : ''}
+        ${a.datum ? `<div class="card-sub" style="margin:2px 0 0${isOverdue(a) ? ';color:#c0392b;font-weight:600' : ''}">${formatDatum(a.datum)}</div>` : ''}
       </div>
       <span class="actie-badge ${a.status}" style="cursor:pointer" onclick="cycleStatus('${a.id}')">${STATUS_LABEL[a.status] || 'Te doen'}</span>
       <span class="actie-wie">${escapeHtml(a.wie || 'Samen')}</span>
@@ -167,15 +168,27 @@ function renderActies() {
     </div>
   `).join('');
 }
+function formatDatum(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function isOverdue(a) {
+  if (!a.datum || a.status === 'klaar') return false;
+  return a.datum < new Date().toISOString().slice(0, 10);
+}
 async function voegActieToe() {
   const tekst = document.getElementById('actie-tekst').value.trim();
+  const status = document.getElementById('actie-status').value;
   const wie = document.getElementById('actie-wie').value;
   const deelplanId = document.getElementById('actie-deelplan').value;
+  const datum = document.getElementById('actie-datum').value;
   if (!tekst) return;
   state.acties.items = state.acties.items || [];
-  state.acties.items.push({ id: nieuwId(), tekst, status: 'te-doen', wie, deelplanId: deelplanId || null });
+  state.acties.items.push({ id: nieuwId(), tekst, status, wie, deelplanId: deelplanId || null, datum: datum || null });
   await bewaarData('acties', state.acties);
   document.getElementById('actie-tekst').value = '';
+  document.getElementById('actie-status').value = 'te-doen';
+  document.getElementById('actie-datum').value = '';
   renderActies();
 }
 async function toggleActie(id) {
