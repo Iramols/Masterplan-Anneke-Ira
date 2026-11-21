@@ -1,0 +1,101 @@
+:root {
+  --sage: #4a7c59;
+  --sage-light: #e8f0eb;
+  --sage-mid: #b8d4c0;
+  --sand: #f5f0e8;
+  --sand-dark: #e0d8cc;
+  --charcoal: #2a2a2a;
+  --muted: #6b6b6b;
+  --white: #ffffff;
+  --green-dark: #213d36;
+  --gold: #d8c7a3;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --status-todo: #c0392b;
+  --status-bezig: #c8855a;
+  --status-klaar: #4a7c59;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--charcoal); min-height: 100vh; }
+
+/* ===== LOGIN ===== */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--radius); padding: 28px; max-width: 440px; width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 18px; }
+
+.plan-banner { background: var(--green-dark); border-radius: 10px 10px 0 0; padding: 10px 14px; text-align: center; }
+.plan-banner span { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+
+.brand-card { background: var(--green-dark); border-radius: 0 0 14px 14px; padding: 18px 14px 20px; text-align: center; margin-bottom: 18px; border-top: 1px solid rgba(255,255,255,0.12); }
+.brand-naam { color: #fff; font-weight: 700; font-size: 22px; letter-spacing: 0.5px; }
+.brand-slogan { color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 0.4px; margin-top: 8px; }
+.brand-lijn { height: 1px; background: #7f948c; margin: 12px 0; }
+.brand-woorden { color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.2px; }
+.brand-sub { color: var(--gold); font-size: 11px; margin-top: 8px; letter-spacing: 0.3px; }
+
+.form-row { margin-bottom: 16px; }
+.form-row label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); background: var(--white); outline: none; transition: border-color 0.2s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--sage); }
+.form-row textarea { min-height: 80px; resize: vertical; }
+.password-field-wrap { position: relative; }
+.password-field-wrap input { padding-right: 42px; }
+.password-toggle-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: none; background: none; cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; opacity: 0.6; }
+.password-toggle-btn:hover { opacity: 1; background: var(--sand); }
+
+/* ===== BUTTONS ===== */
+.btn-primary { background: var(--sage); color: var(--white); border: none; padding: 13px 24px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; width: 100%; }
+.btn-primary:hover { background: #3d6649; transform: translateY(-1px); }
+.btn-primary:disabled { background: var(--sand-dark); color: var(--muted); cursor: not-allowed; transform: none; }
+.btn-sm { background: var(--sage-light); color: var(--sage); border: 1px solid var(--sage-mid); padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn-sm:hover { background: var(--sage-mid); }
+.btn-danger { background: var(--accent-light, #f5e8df); color: #c0392b; border: 1px solid #e0b4ae; }
+
+/* ===== APP SHELL ===== */
+.header { background: var(--white); border-bottom: 1px solid var(--sand-dark); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.logo { font-weight: 700; font-size: 18px; color: var(--green-dark); letter-spacing: 0.3px; }
+.logo span { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav-btn { background: none; border: none; padding: 9px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.nav-btn:hover { background: var(--sage-light); color: var(--sage); }
+.nav-btn.active { background: var(--sage); color: var(--white); }
+
+.main { max-width: 920px; margin: 0 auto; padding: 28px 20px 60px; }
+.view { display: none; }
+.view.active { display: block; }
+
+.card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--sand-dark); padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.card-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 14px; color: var(--green-dark); }
+.card-sub { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.meta { font-size: 11px; color: var(--muted); margin-top: 10px; }
+
+.fase-item, .deelplan-item { border: 1px solid var(--sand-dark); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 12px; }
+.fase-header, .deelplan-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.fase-titel, .deelplan-titel { font-weight: 600; font-size: 15px; }
+.fase-periode { font-size: 11px; color: var(--sage); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.item-tekst { font-size: 14px; color: var(--charcoal); white-space: pre-wrap; line-height: 1.5; }
+
+.actie-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand-dark); }
+.actie-row:last-child { border-bottom: none; }
+.actie-check { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--sage); cursor: pointer; }
+.actie-tekst { flex: 1; font-size: 14px; }
+.actie-tekst.klaar { text-decoration: line-through; color: var(--muted); }
+.actie-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px; }
+.actie-badge.te-doen { background: #fbe4e1; color: var(--status-todo); }
+.actie-badge.bezig { background: #f5e8df; color: var(--status-bezig); }
+.actie-badge.klaar { background: var(--sage-light); color: var(--sage); }
+.actie-wie { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; }
+.actie-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; opacity: 0.5; }
+.actie-del:hover { opacity: 1; color: #c0392b; }
+
+.add-row { display: flex; gap: 8px; margin-top: 14px; }
+.add-row input, .add-row select { flex: 1; }
+
+.empty-hint { font-size: 13px; color: var(--muted); font-style: italic; padding: 10px 0; }
+
+@media (max-width: 640px) {
+  .header { flex-direction: column; align-items: flex-start; }
+  .nav { width: 100%; }
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Masterplan Anneke & Ira</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="boot-loader" style="position:fixed;inset:0;z-index:300;background:var(--sand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+  <div style="font-weight:700;font-size:22px;letter-spacing:1px;color:#213d36">MASTERPLAN</div>
+  <div style="font-size:12px;color:var(--muted)">Laden…</div>
+</div>
+
+<div class="overlay" id="login-overlay">
+  <div class="modal">
+    <div class="plan-banner"><span>Masterplan Anneke &amp; Ira</span></div>
+    <div class="brand-card">
+      <div class="brand-naam">HEALTHPOTENTIAL</div>
+      <div class="brand-slogan">UNLOCK YOUR POTENTIAL. LIVE A HEALTHY LIFE.</div>
+      <div class="brand-lijn"></div>
+      <div class="brand-woorden">HEALTH · DIRECTION · GUIDANCE · GROWTH</div>
+      <div class="brand-sub">BY ANNEKE LIFESTYLE COACHING</div>
+    </div>
+    <div class="modal-title">Inloggen</div>
+    <form id="login-form">
+      <div class="form-row"><label>E-mail of gebruikersnaam</label><input id="login-email" type="text" autocomplete="username" required></div>
+      <div class="form-row">
+        <label>Wachtwoord</label>
+        <div class="password-field-wrap">
+          <input id="login-password" type="password" autocomplete="current-password" required>
+          <button type="button" id="login-password-toggle" class="password-toggle-btn" aria-label="Wachtwoord tonen">👁️</button>
+        </div>
+      </div>
+      <div id="login-error" style="color:#c0392b;font-size:12px;margin-bottom:12px"></div>
+      <button type="submit" class="btn-primary" id="login-submit">Inloggen →</button>
+    </form>
+  </div>
+</div>
+
+<div id="app-shell" style="display:none">
+  <header class="header">
+    <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
+      <button class="nav-btn" data-view="masterplan" onclick="gaNaar('masterplan')">Masterplan</button>
+      <button class="nav-btn" data-view="deelplannen" onclick="gaNaar('deelplannen')">Deelplannen</button>
+      <button class="nav-btn" data-view="acties" onclick="gaNaar('acties')">Acties</button>
+    </nav>
+    <button class="btn-sm" onclick="doLogout()">🚪 Uit</button>
+  </header>
+
+  <main class="main">
+
+    <!-- EINDDOEL -->
+    <section class="view active" id="view-einddoel">
+      <div class="card">
+        <div class="card-title">Ons einddoel</div>
+        <div class="card-sub">Waar staan we over een aantal jaar? Beschrijf het eindbeeld van het bedrijf.</div>
+        <textarea id="einddoel-tekst" rows="8" style="width:100%;padding:12px 14px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px" placeholder="Bijv.: over 5 jaar hebben we een bloeiende lifestyle-coachingpraktijk met..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px">
+          <button class="btn-sm" onclick="saveEinddoel()">Opslaan</button>
+        </div>
+        <div class="meta" id="einddoel-meta"></div>
+      </div>
+    </section>
+
+    <!-- MASTERPLAN -->
+    <section class="view" id="view-masterplan">
+      <div class="card">
+        <div class="card-title">Lange-termijn masterplan</div>
+        <div class="card-sub">De fases op weg naar het einddoel.</div>
+        <div id="fase-lijst"></div>
+        <div class="empty-hint" id="fase-leeg" style="display:none">Nog geen fases toegevoegd.</div>
+        <div class="add-row" style="flex-wrap:wrap">
+          <input id="fase-periode" placeholder="Periode (bijv. Jaar 1, 2026-2027)" style="flex:0 0 220px">
+          <input id="fase-titel" placeholder="Titel van deze fase">
+        </div>
+        <textarea id="fase-omschrijving" rows="2" placeholder="Omschrijving (optioneel)" style="width:100%;margin-top:8px;padding:11px 14px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn-sm" onclick="voegFaseToe()">+ Fase toevoegen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEELPLANNEN -->
+    <section class="view" id="view-deelplannen">
+      <div class="card">
+        <div class="card-title">Deelplannen</div>
+        <div class="card-sub">De losse bouwstenen van het bedrijf (bijv. aanbod, marketing, financiën).</div>
+        <div id="deelplan-lijst"></div>
+        <div class="empty-hint" id="deelplan-leeg" style="display:none">Nog geen deelplannen toegevoegd.</div>
+        <div class="add-row">
+          <input id="deelplan-titel" placeholder="Naam van het deelplan">
+        </div>
+        <textarea id="deelplan-omschrijving" rows="2" placeholder="Omschrijving (optioneel)" style="width:100%;margin-top:8px;padding:11px 14px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn-sm" onclick="voegDeelplanToe()">+ Deelplan toevoegen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIES -->
+    <section class="view" id="view-acties">
+      <div class="card">
+        <div class="card-title">Acties</div>
+        <div class="card-sub">Concrete stappen, los of gekoppeld aan een deelplan.</div>
+        <div id="actie-lijst"></div>
+        <div class="empty-hint" id="actie-leeg" style="display:none">Nog geen acties toegevoegd.</div>
+        <div class="add-row">
+          <input id="actie-tekst" placeholder="Nieuwe actie...">
+          <select id="actie-wie" style="flex:0 0 110px">
+            <option value="Samen">Samen</option>
+            <option value="Ira">Ira</option>
+            <option value="Anneke">Anneke</option>
+          </select>
+          <select id="actie-deelplan" style="flex:0 0 160px">
+            <option value="">(geen deelplan)</option>
+          </select>
+          <button class="btn-sm" onclick="voegActieToe()">+ Toevoegen</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
