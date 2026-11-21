@@ -43,6 +43,24 @@ async function bewaarData(key, value) {
 }
 
 async function initApp() {
+  await ververDataStil();
+  // Elke minuut automatisch de nieuwste data ophalen (bv. wat Anneke of Ira
+  // zojuist op een ander toestel toevoegde) -- alleen de eerste keer de
+  // timer starten, anders stapelen herhaalde initApp()-aanroepen intervals op.
+  if (!autoVersGestart) {
+    autoVersGestart = true;
+    setInterval(function () {
+      // Niet verversen terwijl iemand middenin een bewerking of invoer zit --
+      // anders verdwijnt onopgeslagen tekst zomaar.
+      if (bewerkActieId) return;
+      const actief = document.activeElement;
+      if (actief && ['INPUT', 'TEXTAREA', 'SELECT'].includes(actief.tagName)) return;
+      ververDataStil();
+    }, 60000);
+  }
+}
+let autoVersGestart = false;
+async function ververDataStil() {
   state.einddoel = await laadData('einddoel', { tekst: '' });
   state.masterplan = await laadData('masterplan', { fases: [] });
   state.deelplannen = await laadData('deelplannen', { items: [] });
@@ -58,6 +76,7 @@ function gaNaar(view) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
   document.querySelector('.nav-btn[data-view="' + view + '"]').classList.add('active');
+  try { sessionStorage.setItem('masterplan_tab', view); } catch (e) {}
 }
 
 // ===== EINDDOEL =====

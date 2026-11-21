@@ -63,6 +63,11 @@ async function resolveSession() {
   hideLogin();
   document.getElementById('app-shell').style.display = '';
   document.getElementById('boot-loader').style.display = 'none';
+  // Na de Ververs-knop (een volledige herlading) weer in hetzelfde tabblad
+  // uitkomen i.p.v. steeds terug bij Einddoel -- gaNaar() bewaart het
+  // actieve tabblad bij elke wissel, zie app.js.
+  const opgeslagenTab = sessionStorage.getItem('masterplan_tab');
+  if (opgeslagenTab && typeof gaNaar === 'function') gaNaar(opgeslagenTab);
   if (typeof initApp === 'function') await initApp();
 }
 
