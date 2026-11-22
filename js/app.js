@@ -107,6 +107,15 @@ async function saveEinddoel() {
   await bewaarData('einddoel', state.einddoel);
   renderEinddoel();
 }
+// Toont met een kleurtje op de V/S-knoppen of de cursor nu in vette/schuine
+// tekst staat, net als in bekende tekstverwerkers.
+function updateRteToolbar() {
+  const boldBtn = document.getElementById('rte-bold-btn');
+  const italicBtn = document.getElementById('rte-italic-btn');
+  if (!boldBtn || !italicBtn) return;
+  boldBtn.classList.toggle('actief', document.queryCommandState('bold'));
+  italicBtn.classList.toggle('actief', document.queryCommandState('italic'));
+}
 
 // ===== MASTERPLAN (fases) =====
 function renderMasterplan() {

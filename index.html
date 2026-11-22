@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Masterplan Anneke & Ira</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=19">
+<link rel="stylesheet" href="css/styles.css?v=20">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,7 +45,7 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v19)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v20)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
       <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
@@ -72,10 +72,10 @@
         <div class="card-title">Ons einddoel</div>
         <div class="card-sub">Waar staan we over een aantal jaar? Beschrijf het eindbeeld van het bedrijf.</div>
         <div class="rte-toolbar">
-          <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold')" title="Vet"><b>V</b></button>
-          <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('italic')" title="Schuin"><i>S</i></button>
+          <button type="button" id="rte-bold-btn" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold'); updateRteToolbar()" title="Vet"><b>V</b></button>
+          <button type="button" id="rte-italic-btn" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('italic'); updateRteToolbar()" title="Schuin"><i>S</i></button>
         </div>
-        <div id="einddoel-tekst" class="rte-veld" contenteditable="true" data-placeholder="Bijv.: over 5 jaar hebben we een bloeiende lifestyle-coachingpraktijk met..."></div>
+        <div id="einddoel-tekst" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbar()" onmouseup="updateRteToolbar()" data-placeholder="Bijv.: over 5 jaar hebben we een bloeiende lifestyle-coachingpraktijk met..."></div>
         <div style="display:flex;justify-content:flex-end;margin-top:12px">
           <button class="btn-sm" onclick="saveEinddoel()">Opslaan</button>
         </div>
@@ -182,8 +182,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=19"></script>
-<script src="js/auth.js?v=19"></script>
-<script src="js/app.js?v=19"></script>
+<script src="js/supabase-config.js?v=20"></script>
+<script src="js/auth.js?v=20"></script>
+<script src="js/app.js?v=20"></script>
 </body>
 </html>
