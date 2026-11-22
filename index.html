@@ -45,11 +45,11 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v26)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v27)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
-      <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
-      <button class="nav-btn" data-view="deelplannen" onclick="gaNaar('deelplannen')">Deelplannen</button>
+      <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Doelen 2030</button>
+      <button class="nav-btn" data-view="deelplannen" onclick="gaNaar('deelplannen')">Tussentijdse doelen 2027-2029</button>
       <button class="nav-btn" data-view="acties" onclick="gaNaar('acties')">Acties</button>
     </nav>
     <button class="btn-sm" onclick="doLogout()">🚪 Uit</button>
@@ -68,8 +68,8 @@
     <!-- EINDDOEL -->
     <section class="view" id="view-einddoel">
       <div class="card">
-        <div class="card-title">Ons einddoel</div>
-        <div class="card-sub">Waar staan we over een aantal jaar? Beschrijf het eindbeeld van het bedrijf.</div>
+        <div class="card-title">Doelen 2030</div>
+        <div class="card-sub">Waar staan we in 2030? Beschrijf het eindbeeld van het bedrijf.</div>
         <div class="rte-toolbar" data-voor="einddoel-tekst">
           <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('einddoel-tekst','bold')" title="Vet"><b>V</b></button>
           <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('einddoel-tekst','italic')" title="Schuin"><i>S</i></button>
@@ -82,9 +82,11 @@
     <!-- DEELPLANNEN -->
     <section class="view" id="view-deelplannen">
       <div class="card">
-        <div class="card-title">Deelplannen</div>
+        <div class="card-title">Tussentijdse doelen 2027-2029</div>
         <div class="card-sub">De losse bouwstenen van het bedrijf (bijv. aanbod, marketing, financiën).</div>
-        <div class="add-row">
+        <div id="deelplan-lijst"></div>
+        <div class="empty-hint" id="deelplan-leeg" style="display:none">Nog geen deelplannen toegevoegd.</div>
+        <div class="add-row" style="margin-top:16px">
           <input id="deelplan-titel" placeholder="Naam van het deelplan">
         </div>
         <div class="rte-toolbar" data-voor="deelplan-omschrijving" style="margin-top:8px">
@@ -95,8 +97,6 @@
         <div style="display:flex;justify-content:flex-end;margin-top:10px">
           <button class="btn-sm" onclick="voegDeelplanToe()">+ Deelplan toevoegen</button>
         </div>
-        <div id="deelplan-lijst" style="margin-top:16px"></div>
-        <div class="empty-hint" id="deelplan-leeg" style="display:none">Nog geen deelplannen toegevoegd.</div>
       </div>
     </section>
 
@@ -140,8 +140,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=26"></script>
-<script src="js/auth.js?v=26"></script>
-<script src="js/app.js?v=26"></script>
+<script src="js/supabase-config.js?v=27"></script>
+<script src="js/auth.js?v=27"></script>
+<script src="js/app.js?v=27"></script>
 </body>
 </html>

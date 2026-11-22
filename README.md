@@ -12,8 +12,8 @@ Private planningssite voor het opzetten van het leefstijlbedrijf: einddoel, deel
 
 ## Structuur
 
-- **Einddoel** — het eindbeeld van het bedrijf over een aantal jaar
-- **Deelplannen** — de losse bouwstenen (aanbod, marketing, financiën, ...)
+- **Doelen 2030** — het eindbeeld van het bedrijf over een aantal jaar
+- **Tussentijdse doelen 2027-2029** — de losse bouwstenen (aanbod, marketing, financiën, ...)
 - **Acties** — concrete stappen
 
 Alle data staat in Supabase (tabel `masterplan_data`), niet in deze repo — de site zelf mag dus public zijn zonder dat het masterplan zichtbaar wordt voor anderen.
