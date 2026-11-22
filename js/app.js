@@ -90,7 +90,9 @@ function gaNaar(view) {
 
 // ===== EINDDOEL =====
 function renderEinddoel() {
-  document.getElementById('einddoel-tekst').value = state.einddoel.tekst || '';
+  // state.einddoel.tekst bevat HTML (vet/schuin via de toolbar) -- alleen
+  // Ira/Anneke schrijven dit, dus innerHTML is hier geen risico.
+  document.getElementById('einddoel-tekst').innerHTML = state.einddoel.tekst || '';
   const meta = state.einddoel.updatedAt
     ? 'Laatst bijgewerkt door ' + (state.einddoel.updatedBy || '?') + ' op ' + new Date(state.einddoel.updatedAt).toLocaleString('nl-NL')
     : '';
@@ -98,7 +100,7 @@ function renderEinddoel() {
 }
 async function saveEinddoel() {
   state.einddoel = {
-    tekst: document.getElementById('einddoel-tekst').value,
+    tekst: document.getElementById('einddoel-tekst').innerHTML,
     updatedAt: new Date().toISOString(),
     updatedBy: window.loggedInNaam || ''
   };

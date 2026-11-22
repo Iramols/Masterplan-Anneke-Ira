@@ -45,6 +45,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .password-toggle-btn { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: none; background: none; cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; opacity: 0.6; }
 .password-toggle-btn:hover { opacity: 1; background: var(--sand); }
 
+/* ===== EENVOUDIGE RICH TEXT (vet/schuin) ===== */
+.rte-toolbar { display: flex; gap: 4px; margin-bottom: 6px; }
+.rte-btn { width: 30px; height: 30px; border: 1.5px solid var(--sand-dark); border-radius: 6px; background: var(--white); cursor: pointer; font-size: 13px; color: var(--charcoal); }
+.rte-btn:hover { background: var(--sage-light); border-color: var(--sage-mid); }
+.rte-veld { min-height: 160px; width: 100%; padding: 12px 14px; border: 1.5px solid var(--sand-dark); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--charcoal); outline: none; line-height: 1.5; }
+.rte-veld:focus { border-color: var(--sage); }
+.rte-veld:empty:before { content: attr(data-placeholder); color: var(--muted); }
+
 /* ===== BUTTONS ===== */
 .btn-primary { background: var(--sage); color: var(--white); border: none; padding: 13px 24px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; width: 100%; }
 .btn-primary:hover { background: #3d6649; transform: translateY(-1px); }
