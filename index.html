@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Masterplan Anneke & Ira</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=20">
+<link rel="stylesheet" href="css/styles.css?v=22">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,11 +45,10 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v21)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v22)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
       <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
-      <button class="nav-btn" data-view="masterplan" onclick="gaNaar('masterplan')">Masterplan</button>
       <button class="nav-btn" data-view="deelplannen" onclick="gaNaar('deelplannen')">Deelplannen</button>
       <button class="nav-btn" data-view="acties" onclick="gaNaar('acties')">Acties</button>
     </nav>
@@ -80,48 +79,6 @@
           <button class="btn-sm" onclick="saveEinddoel()">Opslaan</button>
         </div>
         <div class="meta" id="einddoel-meta"></div>
-      </div>
-    </section>
-
-    <!-- MASTERPLAN -->
-    <section class="view" id="view-masterplan">
-      <div class="card">
-        <div class="card-title">Lange-termijn masterplan</div>
-        <div class="card-sub">De fases op weg naar het einddoel.</div>
-        <div id="fase-lijst"></div>
-        <div class="empty-hint" id="fase-leeg" style="display:none">Nog geen fases toegevoegd.</div>
-        <div class="add-row" style="flex-wrap:wrap">
-          <input id="fase-periode" placeholder="Periode (bijv. Jaar 1, 2026-2027)" style="flex:0 0 220px">
-          <input id="fase-titel" placeholder="Titel van deze fase">
-        </div>
-        <textarea id="fase-omschrijving" rows="2" placeholder="Omschrijving (optioneel)" style="width:100%;margin-top:8px;padding:11px 14px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:10px">
-          <button class="btn-sm" onclick="voegFaseToe()">+ Fase toevoegen</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Excel-plan</div>
-        <div class="card-sub">Upload hier je laatste Excel-planning, zodat die ook voor de ander beschikbaar is.</div>
-        <div id="excel-info" class="meta"></div>
-        <div class="add-row" style="margin-top:10px">
-          <input type="file" id="excel-bestand" accept=".xlsx,.xls">
-          <button class="btn-sm" onclick="uploadExcel()">Uploaden</button>
-          <button class="btn-sm" id="excel-download-btn" onclick="downloadExcel()" style="display:none">Downloaden</button>
-        </div>
-        <div id="excel-status" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Plaatje van het plan</div>
-        <div class="card-sub">Upload een afbeelding van je plan (bijv. een screenshot of export vanuit Excel) om 'm hier te laten zien.</div>
-        <img id="plaatje-img" style="max-width:100%;border-radius:10px;border:1px solid var(--sand-dark);display:none;margin-bottom:12px">
-        <div class="empty-hint" id="plaatje-leeg">Nog geen afbeelding geupload.</div>
-        <div class="add-row" style="margin-top:10px">
-          <input type="file" id="plaatje-bestand" accept="image/*">
-          <button class="btn-sm" onclick="uploadPlaatje()">Uploaden</button>
-        </div>
-        <div id="plaatje-status" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
       </div>
     </section>
 
@@ -182,8 +139,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=21"></script>
-<script src="js/auth.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
+<script src="js/supabase-config.js?v=22"></script>
+<script src="js/auth.js?v=22"></script>
+<script src="js/app.js?v=22"></script>
 </body>
 </html>

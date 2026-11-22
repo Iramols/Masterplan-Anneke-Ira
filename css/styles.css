@@ -82,10 +82,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .card-sub { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 .meta { font-size: 11px; color: var(--muted); margin-top: 10px; }
 
-.fase-item, .deelplan-item { border: 1px solid var(--sand-dark); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 12px; }
-.fase-header, .deelplan-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-.fase-titel, .deelplan-titel { font-weight: 600; font-size: 15px; }
-.fase-periode { font-size: 11px; color: var(--sage); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.deelplan-item { border: 1px solid var(--sand-dark); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 12px; }
+.deelplan-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.deelplan-titel { font-weight: 600; font-size: 15px; }
 .item-tekst { font-size: 14px; color: var(--charcoal); white-space: pre-wrap; line-height: 1.5; }
 
 /* Vaste kolombreedtes, hergebruikt door de kopbalk, elke actierij en de

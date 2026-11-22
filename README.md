@@ -1,6 +1,6 @@
 # Masterplan Anneke & Ira
 
-Private planningssite voor het opzetten van het leefstijlbedrijf: einddoel, lange-termijn masterplan, deelplannen en acties. Gedeeld tussen Ira en Anneke, achter een login.
+Private planningssite voor het opzetten van het leefstijlbedrijf: einddoel, deelplannen en acties. Gedeeld tussen Ira en Anneke, achter een login.
 
 ## Opzetten
 
@@ -13,8 +13,7 @@ Private planningssite voor het opzetten van het leefstijlbedrijf: einddoel, lang
 ## Structuur
 
 - **Einddoel** — het eindbeeld van het bedrijf over een aantal jaar
-- **Masterplan** — de fases op weg daarnaartoe
 - **Deelplannen** — de losse bouwstenen (aanbod, marketing, financiën, ...)
-- **Acties** — concrete stappen, los of gekoppeld aan een deelplan
+- **Acties** — concrete stappen
 
 Alle data staat in Supabase (tabel `masterplan_data`), niet in deze repo — de site zelf mag dus public zijn zonder dat het masterplan zichtbaar wordt voor anderen.

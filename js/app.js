@@ -1,6 +1,6 @@
 // ========== MASTERPLAN APP ==========
 // Alle data staat in de tabel `masterplan_data` (key/value, zie supabase/schema.sql).
-// Vier keys: einddoel, masterplan, deelplannen, acties. Simpele JSON-blobs i.p.v.
+// Drie keys: einddoel, deelplannen, acties. Simpele JSON-blobs i.p.v.
 // losse tabellen per onderdeel -- makkelijk aan te passen zolang de opzet nog niet vaststaat.
 
 // Haalt gegarandeerd de laatste versie op: een nieuwe, nog nooit gecachete
@@ -12,10 +12,8 @@ function verversNu() {
 
 let state = {
   einddoel: { tekst: '' },
-  masterplan: { fases: [] },
   deelplannen: { items: [] },
-  acties: { items: [] },
-  excelInfo: null
+  acties: { items: [] }
 };
 
 // SVG i.p.v. emoji: een 🗑️-emoji rendert op sommige systemen amper zichtbaar
@@ -63,16 +61,11 @@ async function initApp() {
 let autoVersGestart = false;
 async function ververDataStil() {
   state.einddoel = await laadData('einddoel', { tekst: '' });
-  state.masterplan = await laadData('masterplan', { fases: [] });
   state.deelplannen = await laadData('deelplannen', { items: [] });
   state.acties = await laadData('acties', { items: [] });
-  state.excelInfo = await laadData('excel_info', null);
   renderEinddoel();
-  renderMasterplan();
   renderDeelplannen();
   renderActies();
-  renderExcelInfo();
-  renderPlaatje();
 }
 
 function gaNaar(view) {
@@ -115,97 +108,6 @@ function updateRteToolbar() {
   if (!boldBtn || !italicBtn) return;
   boldBtn.classList.toggle('actief', document.queryCommandState('bold'));
   italicBtn.classList.toggle('actief', document.queryCommandState('italic'));
-}
-
-// ===== MASTERPLAN (fases) =====
-function renderMasterplan() {
-  const lijst = document.getElementById('fase-lijst');
-  const fases = state.masterplan.fases || [];
-  document.getElementById('fase-leeg').style.display = fases.length ? 'none' : '';
-  lijst.innerHTML = fases.map(f => `
-    <div class="fase-item">
-      <div class="fase-header">
-        <div>
-          <div class="fase-periode">${escapeHtml(f.periode || '')}</div>
-          <div class="fase-titel">${escapeHtml(f.titel || '')}</div>
-        </div>
-        <button class="actie-del" onclick="verwijderFase('${f.id}')" title="Verwijderen">✕</button>
-      </div>
-      ${f.omschrijving ? `<div class="item-tekst">${escapeHtml(f.omschrijving)}</div>` : ''}
-    </div>
-  `).join('');
-}
-async function voegFaseToe() {
-  const periode = document.getElementById('fase-periode').value.trim();
-  const titel = document.getElementById('fase-titel').value.trim();
-  const omschrijving = document.getElementById('fase-omschrijving').value.trim();
-  if (!titel) return;
-  state.masterplan.fases = state.masterplan.fases || [];
-  state.masterplan.fases.push({ id: nieuwId(), periode, titel, omschrijving });
-  await bewaarData('masterplan', state.masterplan);
-  document.getElementById('fase-periode').value = '';
-  document.getElementById('fase-titel').value = '';
-  document.getElementById('fase-omschrijving').value = '';
-  renderMasterplan();
-}
-async function verwijderFase(id) {
-  state.masterplan.fases = (state.masterplan.fases || []).filter(f => f.id !== id);
-  await bewaarData('masterplan', state.masterplan);
-  renderMasterplan();
-}
-
-// ===== EXCEL-PLAN (upload/download) =====
-// Het bestand zelf staat in Supabase Storage (bucket 'masterplan-bestanden'),
-// altijd onder hetzelfde pad -- een nieuwe upload overschrijft de vorige.
-// De metadata (bestandsnaam/datum/door wie) staat als gewone rij in
-// masterplan_data, zodat die net als de rest meteen zichtbaar is voor beiden.
-const EXCEL_BUCKET = 'masterplan-bestanden';
-const EXCEL_PAD = 'masterplan.xlsx';
-
-function renderExcelInfo() {
-  const info = state.excelInfo;
-  const infoEl = document.getElementById('excel-info');
-  const downloadBtn = document.getElementById('excel-download-btn');
-  if (info) {
-    infoEl.textContent = escapeHtml(info.filename) + ' -- geupload door ' + escapeHtml(info.updatedBy || '?') + ' op ' + new Date(info.updatedAt).toLocaleString('nl-NL');
-    downloadBtn.style.display = '';
-  } else {
-    infoEl.textContent = 'Nog geen Excel-bestand geupload.';
-    downloadBtn.style.display = 'none';
-  }
-}
-
-async function uploadExcel() {
-  const input = document.getElementById('excel-bestand');
-  const file = input.files[0];
-  const statusEl = document.getElementById('excel-status');
-  if (!file) { statusEl.textContent = 'Kies eerst een bestand.'; return; }
-  statusEl.textContent = 'Bezig met uploaden...';
-  const sb = getSupabase();
-  const { error: uploadError } = await sb.storage.from(EXCEL_BUCKET).upload(EXCEL_PAD, file, { upsert: true });
-  if (uploadError) { statusEl.textContent = 'Uploaden mislukt: ' + uploadError.message; return; }
-  state.excelInfo = { filename: file.name, updatedAt: new Date().toISOString(), updatedBy: window.loggedInNaam || '' };
-  await bewaarData('excel_info', state.excelInfo);
-  input.value = '';
-  statusEl.textContent = 'Geupload.';
-  renderExcelInfo();
-}
-
-async function downloadExcel() {
-  const statusEl = document.getElementById('excel-status');
-  statusEl.textContent = 'Bezig met downloaden...';
-  const sb = getSupabase();
-  const { data, error } = await sb.storage.from(EXCEL_BUCKET).download(EXCEL_PAD);
-  if (error) { statusEl.textContent = 'Downloaden mislukt: ' + error.message; return; }
-  const url = URL.createObjectURL(data);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (state.excelInfo && state.excelInfo.filename) || EXCEL_PAD;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  statusEl.textContent = '';
 }
 
 // ===== DEELPLANNEN =====
@@ -366,38 +268,4 @@ async function verwijderActie(id) {
 
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-// ===== PLAATJE VAN HET PLAN =====
-// Eén afbeelding (screenshot/export van het plan), zelfde opslagplek als
-// het Excel-bestand. Bucket is niet-publiek, dus downloaden + als blob tonen.
-const PLAATJE_PAD = 'plan-plaatje';
-
-async function renderPlaatje() {
-  const sb = getSupabase();
-  const img = document.getElementById('plaatje-img');
-  const leeg = document.getElementById('plaatje-leeg');
-  const { data, error } = await sb.storage.from(EXCEL_BUCKET).download(PLAATJE_PAD);
-  if (error || !data) {
-    img.style.display = 'none';
-    leeg.style.display = '';
-    return;
-  }
-  img.src = URL.createObjectURL(data);
-  img.style.display = '';
-  leeg.style.display = 'none';
-}
-
-async function uploadPlaatje() {
-  const input = document.getElementById('plaatje-bestand');
-  const file = input.files[0];
-  const statusEl = document.getElementById('plaatje-status');
-  if (!file) { statusEl.textContent = 'Kies eerst een afbeelding.'; return; }
-  statusEl.textContent = 'Bezig met uploaden...';
-  const sb = getSupabase();
-  const { error } = await sb.storage.from(EXCEL_BUCKET).upload(PLAATJE_PAD, file, { upsert: true, contentType: file.type });
-  if (error) { statusEl.textContent = 'Uploaden mislukt: ' + error.message; return; }
-  input.value = '';
-  statusEl.textContent = 'Geupload.';
-  await renderPlaatje();
 }
