@@ -76,10 +76,15 @@ async function ververDataStil() {
 }
 
 function gaNaar(view) {
+  const viewEl = document.getElementById('view-' + view);
+  const navEl = document.querySelector('.nav-btn[data-view="' + view + '"]');
+  // Een opgeslagen tabblad dat niet meer bestaat (bv. na het verwijderen van
+  // een tab) mag het inloggen niet blokkeren -- gewoon negeren.
+  if (!viewEl || !navEl) return;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + view).classList.add('active');
-  document.querySelector('.nav-btn[data-view="' + view + '"]').classList.add('active');
+  viewEl.classList.add('active');
+  navEl.classList.add('active');
   try { sessionStorage.setItem('masterplan_tab', view); } catch (e) {}
 }
 
