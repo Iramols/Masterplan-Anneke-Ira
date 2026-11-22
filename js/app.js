@@ -45,7 +45,6 @@ async function bewaarData(key, value) {
 
 async function initApp() {
   await ververDataStil();
-  renderRoadmap();
   // Elke minuut automatisch de nieuwste data ophalen (bv. wat Anneke of Ira
   // zojuist op een ander toestel toevoegde) -- alleen de eerste keer de
   // timer starten, anders stapelen herhaalde initApp()-aanroepen intervals op.
@@ -73,6 +72,7 @@ async function ververDataStil() {
   renderDeelplannen();
   renderActies();
   renderExcelInfo();
+  renderPlaatje();
 }
 
 function gaNaar(view) {
@@ -352,77 +352,36 @@ function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// ===== ROADMAP (visuele Gantt) =====
-// Vaste, handmatig overgenomen inhoud uit het Excel-masterplan (1e tabblad
-// "MP Lifestyle"). Geen live data uit Supabase -- wordt bijgewerkt zodra
-// Ira/Anneke een nieuwe versie van het Excel-bestand delen.
-const ROADMAP_MAANDEN = ["Jan'26", "Feb'26", "Mar'26", "Apr'26", "May'26", "Jun'26", "Jul'26", "Aug'26", "Sep'26", "Oct'26", "Nov'26", "Dec'26", "Jan'27", "Feb'27", "Mar'27", "Apr'27", "May'27", "Jun'27", "Jul'27", "Aug'27", "Sep'27", "Oct'27", "Nov'27", "Dec'27"];
+// ===== PLAATJE VAN HET PLAN =====
+// Eén afbeelding (screenshot/export van het plan), zelfde opslagplek als
+// het Excel-bestand. Bucket is niet-publiek, dus downloaden + als blob tonen.
+const PLAATJE_PAD = 'plan-plaatje';
 
-const ROADMAP_DATA = [
-  { naam: 'GMF', taken: [
-    { naam: '4 pilots VHV', segmenten: [{ fase: 'Pilots GMF VHV', van: 1, tot: 11, type: 'pilot' }] },
-    { naam: 'Studie Sport & People', segmenten: [
-      { fase: 'Fitness Coach A', van: 1, tot: 2, type: 'deploy' },
-      { fase: 'Fitness Coach B', van: 3, tot: 7, type: 'deploy' }
-    ] },
-    { naam: 'Process definition & pilot', segmenten: [
-      { fase: 'Define process', van: 1, tot: 4, type: 'define' },
-      { fase: 'Pilot Alternate Focus Team', van: 4, tot: 11, type: 'pilot' }
-    ] }
-  ] },
-  { naam: 'D&E (proactive setting A&E relations)', taken: [
-    { naam: 'Pilot D&E VHV FC-003 (Wafer Stage)', segmenten: [{ fase: 'Pilots D&E VHV & Wilton', van: 5, tot: 11, type: 'pilot' }] }
-  ] },
-  { naam: 'Suppliers', taken: [
-    { naam: '5 pilots suppliers', segmenten: [{ fase: 'Pilots 5 suppliers', van: 1, tot: 11, type: 'pilot' }] },
-    { naam: 'Deployment x suppliers YES/NO', segmenten: [{ fase: 'Deployment Suppliers', van: 13, tot: 18, type: 'deployrood' }] }
-  ] },
-  { naam: 'Pilots Wilton — GMF WF & D&E Wilton', taken: [
-    { naam: 'UVLS', segmenten: [{ fase: 'EC', van: 5, tot: 7, type: 'pilot' }, { fase: 'Consumption', van: 8, tot: 18, type: 'pilot' }] },
-    { naam: 'NXE Orion Fibers', segmenten: [{ fase: 'EC', van: 6, tot: 8, type: 'pilot' }, { fase: 'Consumption', van: 9, tot: 18, type: 'pilot' }] },
-    { naam: 'SMASH', segmenten: [{ fase: 'EC', van: 9, tot: 12, type: 'pilot' }, { fase: 'Consumption', van: 13, tot: 18, type: 'pilot' }] },
-    { naam: 'FC-004 (Reticle Stage) start after SMASH', segmenten: [{ fase: 'EC', van: 13, tot: 15, type: 'pilot' }, { fase: 'Consumption', van: 16, tot: 18, type: 'pilot' }] }
-  ] },
-  { naam: 'Alternate Focus Team Wilton (AFT)', taken: [
-    { naam: 'Process definition & small pilot', segmenten: [
-      { fase: 'Define process', van: 4, tot: 7, type: 'define' },
-      { fase: 'Pilot execution 2x 12NCs', van: 13, tot: 15, type: 'pilot' }
-    ] },
-    { naam: 'Pilot Alternate Focus Team', segmenten: [{ fase: 'Pilot Alternate Focus Team', van: 15, tot: 18, type: 'pilot' }] },
-    { naam: 'D&E Wilton', segmenten: [{ fase: 'Deployment D&E Wilton', van: 19, tot: 21, type: 'deploy' }] },
-    { naam: 'Execution Alternate Focus Team', segmenten: [{ fase: 'Execution Alternate Focus Team', van: 19, tot: 23, type: 'pilot' }] },
-    { naam: 'Transfer to R&R standing organization', segmenten: [{ fase: 'Transfer to standing org', van: 21, tot: 24, type: 'deploy' }] }
-  ] }
-];
+async function renderPlaatje() {
+  const sb = getSupabase();
+  const img = document.getElementById('plaatje-img');
+  const leeg = document.getElementById('plaatje-leeg');
+  const { data, error } = await sb.storage.from(EXCEL_BUCKET).download(PLAATJE_PAD);
+  if (error || !data) {
+    img.style.display = 'none';
+    leeg.style.display = '';
+    return;
+  }
+  img.src = URL.createObjectURL(data);
+  img.style.display = '';
+  leeg.style.display = 'none';
+}
 
-function renderRoadmap() {
-  const el = document.getElementById('roadmap-gantt');
-  if (!el) return;
-  const kolommen = '220px ' + ROADMAP_MAANDEN.map(() => 'minmax(50px,1fr)').join(' ');
-  let rij = 1;
-  let html = '<div class="gantt-legenda">'
-    + '<span><i class="gantt-balk define" style="width:14px;height:14px;padding:0;border-radius:4px"></i> Define process</span>'
-    + '<span><i style="background:#0070c0"></i> Pilot</span>'
-    + '<span><i style="background:#002060"></i> Deployment</span>'
-    + '<span><i style="background:#c0392b"></i> Deployment (leverancier)</span>'
-    + '</div>';
-  html += '<div class="gantt-grid" style="grid-template-columns:' + kolommen + '">';
-  html += '<div class="gantt-naamkop" style="grid-row:' + rij + ';grid-column:1"></div>';
-  ROADMAP_MAANDEN.forEach((m, i) => {
-    html += '<div class="gantt-maandkop" style="grid-row:' + rij + ';grid-column:' + (i + 2) + '">' + m + '</div>';
-  });
-  rij++;
-  ROADMAP_DATA.forEach(groep => {
-    html += '<div class="gantt-groep" style="grid-row:' + rij + '">' + escapeHtml(groep.naam) + '</div>';
-    rij++;
-    groep.taken.forEach(taak => {
-      html += '<div class="gantt-naam" style="grid-row:' + rij + ';grid-column:1">' + escapeHtml(taak.naam) + '</div>';
-      taak.segmenten.forEach(seg => {
-        html += '<div class="gantt-balk ' + seg.type + '" style="grid-row:' + rij + ';grid-column:' + (seg.van + 1) + ' / ' + (seg.tot + 2) + '" title="' + escapeHtml(seg.fase) + '">' + escapeHtml(seg.fase) + '</div>';
-      });
-      rij++;
-    });
-  });
-  html += '</div>';
-  el.innerHTML = html;
+async function uploadPlaatje() {
+  const input = document.getElementById('plaatje-bestand');
+  const file = input.files[0];
+  const statusEl = document.getElementById('plaatje-status');
+  if (!file) { statusEl.textContent = 'Kies eerst een afbeelding.'; return; }
+  statusEl.textContent = 'Bezig met uploaden...';
+  const sb = getSupabase();
+  const { error } = await sb.storage.from(EXCEL_BUCKET).upload(PLAATJE_PAD, file, { upsert: true, contentType: file.type });
+  if (error) { statusEl.textContent = 'Uploaden mislukt: ' + error.message; return; }
+  input.value = '';
+  statusEl.textContent = 'Geupload.';
+  await renderPlaatje();
 }
