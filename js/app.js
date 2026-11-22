@@ -90,17 +90,27 @@ function renderEinddoel() {
   document.getElementById('einddoel-tekst').innerHTML = state.einddoel.tekst || '';
   const meta = state.einddoel.updatedAt
     ? 'Laatst bijgewerkt door ' + (state.einddoel.updatedBy || '?') + ' op ' + new Date(state.einddoel.updatedAt).toLocaleString('nl-NL')
-    : '';
+    : 'Wordt automatisch opgeslagen terwijl je typt.';
   document.getElementById('einddoel-meta').textContent = meta;
 }
-async function saveEinddoel() {
-  state.einddoel = {
-    tekst: document.getElementById('einddoel-tekst').innerHTML,
-    updatedAt: new Date().toISOString(),
-    updatedBy: window.loggedInNaam || ''
-  };
-  await bewaarData('einddoel', state.einddoel);
-  renderEinddoel();
+// Automatisch opslaan i.p.v. een knop -- een halve seconde na de laatste
+// toetsaanslag, zodat niets meer verloren gaat als je wegklikt of ververst
+// voordat je zelf op Opslaan zou hebben gedrukt. Vermijdt renderEinddoel()
+// (zou de cursor midden in het typen resetten) en update alleen de metatekst.
+let einddoelAutoSaveTimer = null;
+function autoSaveEinddoel() {
+  clearTimeout(einddoelAutoSaveTimer);
+  const metaEl = document.getElementById('einddoel-meta');
+  metaEl.textContent = 'Bezig met opslaan...';
+  einddoelAutoSaveTimer = setTimeout(async function () {
+    state.einddoel = {
+      tekst: document.getElementById('einddoel-tekst').innerHTML,
+      updatedAt: new Date().toISOString(),
+      updatedBy: window.loggedInNaam || ''
+    };
+    await bewaarData('einddoel', state.einddoel);
+    metaEl.textContent = 'Automatisch opgeslagen om ' + new Date(state.einddoel.updatedAt).toLocaleTimeString('nl-NL');
+  }, 800);
 }
 // Generieke vet/schuin-toolbar, herbruikbaar voor elk bewerkbaar veld
 // (Einddoel, Omschrijving bij Deelplannen, ...) via data-voor="<veld-id>".
@@ -143,31 +153,41 @@ function bewerkDeelplanHtml(d) {
   const veldId = 'de-omschrijving-' + d.id;
   return `
     <div class="deelplan-item">
-      <input id="de-titel-${d.id}" value="${escapeHtml(d.titel || '')}" style="width:100%;margin-bottom:8px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600">
+      <input id="de-titel-${d.id}" value="${escapeHtml(d.titel || '')}" oninput="autoSaveDeelplan('${d.id}')" style="width:100%;margin-bottom:8px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600">
       <div class="rte-toolbar" data-voor="${veldId}">
         <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','bold')" title="Vet"><b>V</b></button>
         <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','italic')" title="Schuin"><i>S</i></button>
       </div>
-      <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
-        <button class="btn-sm" onclick="slaOpDeelplan('${d.id}')">Opslaan</button>
-        <button class="btn-sm" onclick="annuleerBewerkDeelplan()">Annuleren</button>
+      <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" oninput="autoSaveDeelplan('${d.id}')" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <span id="de-status-${d.id}" style="font-size:12px;color:var(--muted)">Wordt automatisch opgeslagen terwijl je typt.</span>
+        <button class="btn-sm" onclick="sluitBewerkDeelplan()">Klaar</button>
       </div>
     </div>
   `;
 }
 function bewerkDeelplan(id) { bewerkDeelplanId = id; renderDeelplannen(); }
-function annuleerBewerkDeelplan() { bewerkDeelplanId = null; renderDeelplannen(); }
-async function slaOpDeelplan(id) {
-  const d = (state.deelplannen.items || []).find(x => x.id === id);
-  if (!d) return;
-  const titel = document.getElementById('de-titel-' + id).value.trim();
-  if (!titel) return;
-  d.titel = titel;
-  d.omschrijving = document.getElementById('de-omschrijving-' + id).innerHTML.trim();
-  await bewaarData('deelplannen', state.deelplannen);
-  bewerkDeelplanId = null;
-  renderDeelplannen();
+function sluitBewerkDeelplan() { bewerkDeelplanId = null; renderDeelplannen(); }
+// Automatisch opslaan i.p.v. Opslaan/Annuleren-knoppen -- voorkomt dat
+// wijzigingen verloren gaan als je wegklikt vóór je zelf zou opslaan.
+// Herrendert bewust niets (zou de cursor resetten), alleen het statustekstje.
+let deelplanAutoSaveTimer = null;
+function autoSaveDeelplan(id) {
+  clearTimeout(deelplanAutoSaveTimer);
+  const statusEl = document.getElementById('de-status-' + id);
+  if (statusEl) statusEl.textContent = 'Bezig met opslaan...';
+  deelplanAutoSaveTimer = setTimeout(async function () {
+    const d = (state.deelplannen.items || []).find(x => x.id === id);
+    const titelEl = document.getElementById('de-titel-' + id);
+    const omschrijvingEl = document.getElementById('de-omschrijving-' + id);
+    if (!d || !titelEl || !omschrijvingEl) return;
+    const titel = titelEl.value.trim();
+    if (!titel) { if (statusEl) statusEl.textContent = 'Naam mag niet leeg zijn.'; return; }
+    d.titel = titel;
+    d.omschrijving = omschrijvingEl.innerHTML.trim();
+    await bewaarData('deelplannen', state.deelplannen);
+    if (statusEl) statusEl.textContent = 'Automatisch opgeslagen om ' + new Date().toLocaleTimeString('nl-NL');
+  }, 800);
 }
 async function verplaatsDeelplan(id, richting) {
   const items = state.deelplannen.items || [];
@@ -233,23 +253,23 @@ function bewerkActieRijHtml(a) {
     <div class="add-row">
       <span class="col-check"></span>
       <div class="actie-tekst-kol">
-        <input id="ae-titel-${a.id}" class="actie-titel-input" value="${escapeHtml(actieTitel(a))}">
-        <textarea id="ae-details-${a.id}" class="actie-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escapeHtml(actieDetails(a))}</textarea>
+        <input id="ae-titel-${a.id}" class="actie-titel-input" oninput="autoSaveActie('${a.id}')" value="${escapeHtml(actieTitel(a))}">
+        <textarea id="ae-details-${a.id}" class="actie-input" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';autoSaveActie('${a.id}')">${escapeHtml(actieDetails(a))}</textarea>
       </div>
-      <select id="ae-status-${a.id}" class="col-status">
+      <select id="ae-status-${a.id}" class="col-status" onchange="autoSaveActie('${a.id}')">
         <option value="te-doen" ${a.status === 'te-doen' ? 'selected' : ''}>Te doen</option>
         <option value="bezig" ${a.status === 'bezig' ? 'selected' : ''}>Bezig</option>
         <option value="klaar" ${a.status === 'klaar' ? 'selected' : ''}>Klaar</option>
       </select>
-      <select id="ae-wie-${a.id}" class="col-wie">
+      <select id="ae-wie-${a.id}" class="col-wie" onchange="autoSaveActie('${a.id}')">
         <option value="Samen" ${a.wie === 'Samen' ? 'selected' : ''}>Samen</option>
         <option value="Ira" ${a.wie === 'Ira' ? 'selected' : ''}>Ira</option>
         <option value="Anneke" ${a.wie === 'Anneke' ? 'selected' : ''}>Anneke</option>
       </select>
-      <input id="ae-datum-${a.id}" type="date" class="col-datum" value="${a.datum || ''}">
-      <button class="btn-sm" onclick="slaOpBewerkteActie('${a.id}')">Opslaan</button>
-      <button class="btn-sm" onclick="annuleerBewerkActie()">Annuleren</button>
+      <input id="ae-datum-${a.id}" type="date" class="col-datum" value="${a.datum || ''}" onchange="autoSaveActie('${a.id}')">
+      <button class="btn-sm" onclick="sluitBewerkActie()">Klaar</button>
     </div>
+    <div id="ae-status-tekst-${a.id}" style="font-size:12px;color:var(--muted);margin:-8px 0 8px 36px">Wordt automatisch opgeslagen terwijl je typt.</div>
   `;
 }
 function bewerkActie(id) {
@@ -258,12 +278,24 @@ function bewerkActie(id) {
   const veld = document.getElementById('ae-details-' + id);
   if (veld) { veld.style.height = 'auto'; veld.style.height = veld.scrollHeight + 'px'; }
 }
-function annuleerBewerkActie() { bewerkActieId = null; renderActies(); }
-async function slaOpBewerkteActie(id) {
+function sluitBewerkActie() { bewerkActieId = null; renderActies(); }
+// Automatisch opslaan i.p.v. Opslaan/Annuleren-knoppen -- zie autoSaveDeelplan
+// hierboven voor dezelfde aanpak en reden.
+let actieAutoSaveTimer = null;
+function autoSaveActie(id) {
+  clearTimeout(actieAutoSaveTimer);
+  const statusEl = document.getElementById('ae-status-tekst-' + id);
+  if (statusEl) statusEl.textContent = 'Bezig met opslaan...';
+  actieAutoSaveTimer = setTimeout(async function () {
+    await slaOpBewerkteActieStil(id, statusEl);
+  }, 800);
+}
+async function slaOpBewerkteActieStil(id, statusEl) {
   const a = (state.acties.items || []).find(x => x.id === id);
-  if (!a) return;
-  const titel = document.getElementById('ae-titel-' + id).value.trim();
-  if (!titel) return;
+  const titelEl = document.getElementById('ae-titel-' + id);
+  if (!a || !titelEl) return;
+  const titel = titelEl.value.trim();
+  if (!titel) { if (statusEl) statusEl.textContent = 'Tekst mag niet leeg zijn.'; return; }
   a.titel = titel;
   a.details = document.getElementById('ae-details-' + id).value.trim();
   delete a.tekst;
@@ -271,8 +303,7 @@ async function slaOpBewerkteActie(id) {
   a.wie = document.getElementById('ae-wie-' + id).value;
   a.datum = document.getElementById('ae-datum-' + id).value || null;
   await bewaarData('acties', state.acties);
-  bewerkActieId = null;
-  renderActies();
+  if (statusEl) statusEl.textContent = 'Automatisch opgeslagen om ' + new Date().toLocaleTimeString('nl-NL');
 }
 function formatDatum(iso) {
   const d = new Date(iso + 'T00:00:00');
