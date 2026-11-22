@@ -20,6 +20,8 @@ let state = {
 // zonder kleur-emoji-lettertype. Dit icoon werkt overal hetzelfde.
 const ICOON_PRULLENBAK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
 const ICOON_POTLOOD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const ICOON_OMHOOG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
+const ICOON_OMLAAG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>';
 
 // Id van de actie die nu inline bewerkt wordt (null = geen enkele).
 let bewerkActieId = null;
@@ -100,14 +102,20 @@ async function saveEinddoel() {
   await bewaarData('einddoel', state.einddoel);
   renderEinddoel();
 }
+// Generieke vet/schuin-toolbar, herbruikbaar voor elk bewerkbaar veld
+// (Einddoel, Omschrijving bij Deelplannen, ...) via data-voor="<veld-id>".
+function rteCmd(veldId, cmd) {
+  document.execCommand(cmd);
+  updateRteToolbarVoor(veldId);
+}
 // Toont met een kleurtje op de V/S-knoppen of de cursor nu in vette/schuine
 // tekst staat, net als in bekende tekstverwerkers.
-function updateRteToolbar() {
-  const boldBtn = document.getElementById('rte-bold-btn');
-  const italicBtn = document.getElementById('rte-italic-btn');
-  if (!boldBtn || !italicBtn) return;
-  boldBtn.classList.toggle('actief', document.queryCommandState('bold'));
-  italicBtn.classList.toggle('actief', document.queryCommandState('italic'));
+function updateRteToolbarVoor(veldId) {
+  const toolbar = document.querySelector('.rte-toolbar[data-voor="' + veldId + '"]');
+  if (!toolbar) return;
+  toolbar.querySelectorAll('.rte-btn').forEach(function (btn) {
+    btn.classList.toggle('actief', document.queryCommandState(btn.dataset.cmd));
+  });
 }
 
 // ===== DEELPLANNEN =====
@@ -115,25 +123,40 @@ function renderDeelplannen() {
   const lijst = document.getElementById('deelplan-lijst');
   const items = state.deelplannen.items || [];
   document.getElementById('deelplan-leeg').style.display = items.length ? 'none' : '';
-  lijst.innerHTML = items.map(d => `
+  lijst.innerHTML = items.map((d, i) => `
     <div class="deelplan-item">
       <div class="deelplan-header">
         <div class="deelplan-titel">${escapeHtml(d.titel || '')}</div>
-        <button class="actie-del" onclick="verwijderDeelplan('${d.id}')" title="Verwijderen">✕</button>
+        <span style="display:flex;gap:6px;flex-shrink:0">
+          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', -1)" title="Omhoog" ${i === 0 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMHOOG}</button>
+          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', 1)" title="Omlaag" ${i === items.length - 1 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMLAAG}</button>
+          <button class="actie-del" onclick="verwijderDeelplan('${d.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
+        </span>
       </div>
-      ${d.omschrijving ? `<div class="item-tekst">${escapeHtml(d.omschrijving)}</div>` : ''}
+      ${d.omschrijving ? `<div class="item-tekst">${d.omschrijving}</div>` : ''}
     </div>
   `).join('');
 }
+async function verplaatsDeelplan(id, richting) {
+  const items = state.deelplannen.items || [];
+  const i = items.findIndex(d => d.id === id);
+  const j = i + richting;
+  if (i < 0 || j < 0 || j >= items.length) return;
+  [items[i], items[j]] = [items[j], items[i]];
+  await bewaarData('deelplannen', state.deelplannen);
+  renderDeelplannen();
+}
 async function voegDeelplanToe() {
   const titel = document.getElementById('deelplan-titel').value.trim();
-  const omschrijving = document.getElementById('deelplan-omschrijving').value.trim();
+  // omschrijving bevat HTML (vet/schuin via de toolbar) -- alleen Ira/Anneke
+  // schrijven dit, dus innerHTML is hier geen risico.
+  const omschrijving = document.getElementById('deelplan-omschrijving').innerHTML.trim();
   if (!titel) return;
   state.deelplannen.items = state.deelplannen.items || [];
   state.deelplannen.items.push({ id: nieuwId(), titel, omschrijving });
   await bewaarData('deelplannen', state.deelplannen);
   document.getElementById('deelplan-titel').value = '';
-  document.getElementById('deelplan-omschrijving').value = '';
+  document.getElementById('deelplan-omschrijving').innerHTML = '';
   renderDeelplannen();
 }
 async function verwijderDeelplan(id) {

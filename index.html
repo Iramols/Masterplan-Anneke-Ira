@@ -45,7 +45,7 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v22)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v24)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
       <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Einddoel</button>
@@ -70,11 +70,11 @@
       <div class="card">
         <div class="card-title">Ons einddoel</div>
         <div class="card-sub">Waar staan we over een aantal jaar? Beschrijf het eindbeeld van het bedrijf.</div>
-        <div class="rte-toolbar">
-          <button type="button" id="rte-bold-btn" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('bold'); updateRteToolbar()" title="Vet"><b>V</b></button>
-          <button type="button" id="rte-italic-btn" class="rte-btn" onmousedown="event.preventDefault()" onclick="document.execCommand('italic'); updateRteToolbar()" title="Schuin"><i>S</i></button>
+        <div class="rte-toolbar" data-voor="einddoel-tekst">
+          <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('einddoel-tekst','bold')" title="Vet"><b>V</b></button>
+          <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('einddoel-tekst','italic')" title="Schuin"><i>S</i></button>
         </div>
-        <div id="einddoel-tekst" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbar()" onmouseup="updateRteToolbar()" data-placeholder="Bijv.: over 5 jaar hebben we een bloeiende lifestyle-coachingpraktijk met..."></div>
+        <div id="einddoel-tekst" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbarVoor('einddoel-tekst')" onmouseup="updateRteToolbarVoor('einddoel-tekst')" data-placeholder="Bijv.: over 5 jaar hebben we een bloeiende lifestyle-coachingpraktijk met..."></div>
         <div style="display:flex;justify-content:flex-end;margin-top:12px">
           <button class="btn-sm" onclick="saveEinddoel()">Opslaan</button>
         </div>
@@ -87,15 +87,19 @@
       <div class="card">
         <div class="card-title">Deelplannen</div>
         <div class="card-sub">De losse bouwstenen van het bedrijf (bijv. aanbod, marketing, financiën).</div>
-        <div id="deelplan-lijst"></div>
-        <div class="empty-hint" id="deelplan-leeg" style="display:none">Nog geen deelplannen toegevoegd.</div>
         <div class="add-row">
           <input id="deelplan-titel" placeholder="Naam van het deelplan">
         </div>
-        <textarea id="deelplan-omschrijving" rows="2" placeholder="Omschrijving (optioneel)" style="width:100%;margin-top:8px;padding:11px 14px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px"></textarea>
+        <div class="rte-toolbar" data-voor="deelplan-omschrijving" style="margin-top:8px">
+          <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('deelplan-omschrijving','bold')" title="Vet"><b>V</b></button>
+          <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('deelplan-omschrijving','italic')" title="Schuin"><i>S</i></button>
+        </div>
+        <div id="deelplan-omschrijving" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbarVoor('deelplan-omschrijving')" onmouseup="updateRteToolbarVoor('deelplan-omschrijving')" style="min-height:70px" data-placeholder="Omschrijving (optioneel)"></div>
         <div style="display:flex;justify-content:flex-end;margin-top:10px">
           <button class="btn-sm" onclick="voegDeelplanToe()">+ Deelplan toevoegen</button>
         </div>
+        <div id="deelplan-lijst" style="margin-top:16px"></div>
+        <div class="empty-hint" id="deelplan-leeg" style="display:none">Nog geen deelplannen toegevoegd.</div>
       </div>
     </section>
 
@@ -139,8 +143,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=22"></script>
-<script src="js/auth.js?v=22"></script>
-<script src="js/app.js?v=22"></script>
+<script src="js/supabase-config.js?v=24"></script>
+<script src="js/auth.js?v=24"></script>
+<script src="js/app.js?v=24"></script>
 </body>
 </html>
