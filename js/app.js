@@ -14,7 +14,8 @@ let state = {
   einddoel: { tekst: '' },
   masterplan: { fases: [] },
   deelplannen: { items: [] },
-  acties: { items: [] }
+  acties: { items: [] },
+  excelInfo: null
 };
 
 // SVG i.p.v. emoji: een 🗑️-emoji rendert op sommige systemen amper zichtbaar
@@ -66,10 +67,12 @@ async function ververDataStil() {
   state.masterplan = await laadData('masterplan', { fases: [] });
   state.deelplannen = await laadData('deelplannen', { items: [] });
   state.acties = await laadData('acties', { items: [] });
+  state.excelInfo = await laadData('excel_info', null);
   renderEinddoel();
   renderMasterplan();
   renderDeelplannen();
   renderActies();
+  renderExcelInfo();
 }
 
 function gaNaar(view) {
@@ -133,6 +136,60 @@ async function verwijderFase(id) {
   state.masterplan.fases = (state.masterplan.fases || []).filter(f => f.id !== id);
   await bewaarData('masterplan', state.masterplan);
   renderMasterplan();
+}
+
+// ===== EXCEL-PLAN (upload/download) =====
+// Het bestand zelf staat in Supabase Storage (bucket 'masterplan-bestanden'),
+// altijd onder hetzelfde pad -- een nieuwe upload overschrijft de vorige.
+// De metadata (bestandsnaam/datum/door wie) staat als gewone rij in
+// masterplan_data, zodat die net als de rest meteen zichtbaar is voor beiden.
+const EXCEL_BUCKET = 'masterplan-bestanden';
+const EXCEL_PAD = 'masterplan.xlsx';
+
+function renderExcelInfo() {
+  const info = state.excelInfo;
+  const infoEl = document.getElementById('excel-info');
+  const downloadBtn = document.getElementById('excel-download-btn');
+  if (info) {
+    infoEl.textContent = escapeHtml(info.filename) + ' -- geupload door ' + escapeHtml(info.updatedBy || '?') + ' op ' + new Date(info.updatedAt).toLocaleString('nl-NL');
+    downloadBtn.style.display = '';
+  } else {
+    infoEl.textContent = 'Nog geen Excel-bestand geupload.';
+    downloadBtn.style.display = 'none';
+  }
+}
+
+async function uploadExcel() {
+  const input = document.getElementById('excel-bestand');
+  const file = input.files[0];
+  const statusEl = document.getElementById('excel-status');
+  if (!file) { statusEl.textContent = 'Kies eerst een bestand.'; return; }
+  statusEl.textContent = 'Bezig met uploaden...';
+  const sb = getSupabase();
+  const { error: uploadError } = await sb.storage.from(EXCEL_BUCKET).upload(EXCEL_PAD, file, { upsert: true });
+  if (uploadError) { statusEl.textContent = 'Uploaden mislukt: ' + uploadError.message; return; }
+  state.excelInfo = { filename: file.name, updatedAt: new Date().toISOString(), updatedBy: window.loggedInNaam || '' };
+  await bewaarData('excel_info', state.excelInfo);
+  input.value = '';
+  statusEl.textContent = 'Geupload.';
+  renderExcelInfo();
+}
+
+async function downloadExcel() {
+  const statusEl = document.getElementById('excel-status');
+  statusEl.textContent = 'Bezig met downloaden...';
+  const sb = getSupabase();
+  const { data, error } = await sb.storage.from(EXCEL_BUCKET).download(EXCEL_PAD);
+  if (error) { statusEl.textContent = 'Downloaden mislukt: ' + error.message; return; }
+  const url = URL.createObjectURL(data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (state.excelInfo && state.excelInfo.filename) || EXCEL_PAD;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  statusEl.textContent = '';
 }
 
 // ===== DEELPLANNEN =====

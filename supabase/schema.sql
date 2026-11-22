@@ -33,6 +33,26 @@ create policy "masterplan_data: ingelogd werkt bij" on masterplan_data
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on table masterplan_data to authenticated;
 
+-- ========== STORAGE: Excel-upload ==========
+-- Eén bucket voor het Excel-planbestand (niet-publiek, alleen voor
+-- ingelogde gebruikers). Een nieuwe upload overschrijft altijd hetzelfde
+-- pad (zie EXCEL_PAD in js/app.js) -- geen historie, gewoon de laatste versie.
+insert into storage.buckets (id, name, public)
+values ('masterplan-bestanden', 'masterplan-bestanden', false)
+on conflict (id) do nothing;
+
+create policy "masterplan-bestanden: ingelogd leest" on storage.objects
+  for select using (bucket_id = 'masterplan-bestanden' and auth.role() = 'authenticated');
+
+create policy "masterplan-bestanden: ingelogd uploadt" on storage.objects
+  for insert with check (bucket_id = 'masterplan-bestanden' and auth.role() = 'authenticated');
+
+create policy "masterplan-bestanden: ingelogd overschrijft" on storage.objects
+  for update using (bucket_id = 'masterplan-bestanden' and auth.role() = 'authenticated');
+
+create policy "masterplan-bestanden: ingelogd verwijdert" on storage.objects
+  for delete using (bucket_id = 'masterplan-bestanden' and auth.role() = 'authenticated');
+
 -- ========== Het gedeelde account aanmaken ==========
 -- Supabase dashboard -> Authentication -> Add user:
 --   masterplan@masterplan.local   (of jullie eigen echte e-mailadres)
