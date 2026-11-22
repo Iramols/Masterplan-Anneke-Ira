@@ -55,7 +55,7 @@ async function initApp() {
       // anders verdwijnt onopgeslagen tekst zomaar.
       if (bewerkActieId) return;
       const actief = document.activeElement;
-      if (actief && ['INPUT', 'TEXTAREA', 'SELECT'].includes(actief.tagName)) return;
+      if (actief && (['INPUT', 'TEXTAREA', 'SELECT'].includes(actief.tagName) || actief.isContentEditable)) return;
       ververDataStil();
     }, 60000);
   }
