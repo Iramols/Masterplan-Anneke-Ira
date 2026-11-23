@@ -54,6 +54,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .rte-veld:focus { border-color: var(--sage); }
 .rte-veld:empty:before { content: attr(data-placeholder); color: var(--muted); }
 
+/* ===== TEKSTKLEUR (zoals in PowerPoint: A-knop met kleurstreep + palet) ===== */
+.rte-kleur-wrap { position: relative; display: inline-block; }
+.rte-btn-kleur { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.rte-kleur-streep { width: 18px; height: 3px; border-radius: 2px; }
+.rte-kleur-dropdown { position: absolute; top: calc(100% + 4px); left: 0; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--white); border: 1px solid var(--sand-dark); border-radius: 10px; padding: 10px; box-shadow: var(--shadow); }
+.rte-kleur-vak { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--sand-dark); cursor: pointer; padding: 0; }
+.rte-kleur-vak:hover { transform: scale(1.1); }
+
 /* ===== BUTTONS ===== */
 .btn-primary { background: var(--sage); color: var(--white); border: none; padding: 13px 24px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; width: 100%; }
 .btn-primary:hover { background: #3d6649; transform: translateY(-1px); }

@@ -112,20 +112,71 @@ function autoSaveEinddoel() {
     metaEl.textContent = 'Automatisch opgeslagen om ' + new Date(state.einddoel.updatedAt).toLocaleTimeString('nl-NL');
   }, 800);
 }
-// Generieke vet/schuin-toolbar, herbruikbaar voor elk bewerkbaar veld
+// Generieke vet/schuin/kleur-toolbar, herbruikbaar voor elk bewerkbaar veld
 // (Einddoel, Omschrijving bij Deelplannen, ...) via data-voor="<veld-id>".
 function rteCmd(veldId, cmd) {
   document.execCommand(cmd);
   updateRteToolbarVoor(veldId);
 }
 // Toont met een kleurtje op de V/S-knoppen of de cursor nu in vette/schuine
-// tekst staat, net als in bekende tekstverwerkers.
+// tekst staat, net als in bekende tekstverwerkers. Werkt ook de kleurstreep
+// onder de A-knop bij, zodat die de kleur op de cursorpositie toont.
 function updateRteToolbarVoor(veldId) {
   const toolbar = document.querySelector('.rte-toolbar[data-voor="' + veldId + '"]');
   if (!toolbar) return;
-  toolbar.querySelectorAll('.rte-btn').forEach(function (btn) {
+  toolbar.querySelectorAll('.rte-btn[data-cmd]').forEach(function (btn) {
     btn.classList.toggle('actief', document.queryCommandState(btn.dataset.cmd));
   });
+  const streep = document.getElementById('rte-kleur-streep-' + veldId);
+  if (streep) {
+    try {
+      const kleur = document.queryCommandValue('foreColor');
+      if (kleur) streep.style.background = kleur;
+    } catch (e) {}
+  }
+}
+// Klapt het kleurenpalet open/dicht onder de A-knop (zoals in PowerPoint).
+// Sluit eerst andere open paletten, zodat er maar één tegelijk open staat.
+function rteKleurToggle(veldId) {
+  const dropdown = document.getElementById('rte-kleur-dropdown-' + veldId);
+  if (!dropdown) return;
+  const openNu = dropdown.style.display === 'grid';
+  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+  dropdown.style.display = openNu ? 'none' : 'grid';
+}
+function rteKleurKies(veldId, kleur) {
+  const veld = document.getElementById(veldId);
+  if (veld) {
+    veld.focus();
+    document.execCommand('foreColor', false, kleur);
+  }
+  const dropdown = document.getElementById('rte-kleur-dropdown-' + veldId);
+  if (dropdown) dropdown.style.display = 'none';
+  updateRteToolbarVoor(veldId);
+}
+// Klik buiten een open kleurenpalet sluit het weer.
+document.addEventListener('click', function (e) {
+  if (e.target.closest('.rte-kleur-wrap')) return;
+  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+});
+// Herbruikbare HTML voor de A-knop + het kleurenpalet, voor dynamisch
+// gegenereerde toolbars (bijv. bij het bewerken van een deelplan).
+function rteKleurHtml(veldId) {
+  const kleuren = [
+    ['#2a2a2a', 'Standaard'], ['#4a7c59', 'Groen'], ['#b8860b', 'Goud'], ['#c0392b', 'Rood'],
+    ['#2e6da4', 'Blauw'], ['#c8855a', 'Oranje'], ['#7d5ba6', 'Paars'], ['#6b6b6b', 'Grijs']
+  ];
+  const vakjes = kleuren.map(function (k) {
+    return `<button type="button" class="rte-kleur-vak" style="background:${k[0]}" onmousedown="event.preventDefault()" onclick="rteKleurKies('${veldId}','${k[0]}')" title="${k[1]}"></button>`;
+  }).join('');
+  return `
+      <div class="rte-kleur-wrap">
+        <button type="button" class="rte-btn rte-btn-kleur" onmousedown="event.preventDefault()" onclick="rteKleurToggle('${veldId}')" title="Tekstkleur">
+          <span style="font-weight:700">A</span>
+          <span class="rte-kleur-streep" id="rte-kleur-streep-${veldId}" style="background:#2a2a2a"></span>
+        </button>
+        <div class="rte-kleur-dropdown" id="rte-kleur-dropdown-${veldId}" style="display:none">${vakjes}</div>
+      </div>`;
 }
 
 // ===== DEELPLANNEN =====
@@ -157,6 +208,7 @@ function bewerkDeelplanHtml(d) {
       <div class="rte-toolbar" data-voor="${veldId}">
         <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','bold')" title="Vet"><b>V</b></button>
         <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','italic')" title="Schuin"><i>S</i></button>
+        ${rteKleurHtml(veldId)}
       </div>
       <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" oninput="autoSaveDeelplan('${d.id}')" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
