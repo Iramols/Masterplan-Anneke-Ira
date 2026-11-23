@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Masterplan Anneke & Ira</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=23">
+<link rel="stylesheet" href="css/styles.css?v=24">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,7 +45,7 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v29)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v30)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="deelplannen" onclick="gaNaar('deelplannen')">Tussentijdse doelen 2027-2029</button>
       <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Doelen 2030</button>
@@ -86,6 +86,22 @@
               <button type="button" class="rte-kleur-vak" style="background:#6b6b6b" onmousedown="event.preventDefault()" onclick="rteKleurKies('deelplan-omschrijving','#6b6b6b')" title="Grijs"></button>
             </div>
           </div>
+          <div class="rte-kleur-wrap">
+            <button type="button" class="rte-btn rte-btn-kleur rte-btn-achtergrond" onmousedown="event.preventDefault()" onclick="rteAchtergrondToggle('deelplan-omschrijving')" title="Achtergrondkleur">
+              <span>Abc</span>
+              <span class="rte-kleur-streep rte-kleur-streep-leeg" id="rte-achtergrond-streep-deelplan-omschrijving"></span>
+            </button>
+            <div class="rte-kleur-dropdown" id="rte-achtergrond-dropdown-deelplan-omschrijving" style="display:none">
+              <button type="button" class="rte-kleur-vak" style="background:repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0/8px 8px" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','transparent')" title="Geen"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fff3b0" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#fff3b0')" title="Geel"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#d7f0df" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#d7f0df')" title="Groen"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#d7e8f7" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#d7e8f7')" title="Blauw"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fbdde4" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#fbdde4')" title="Roze"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fde3cf" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#fde3cf')" title="Oranje"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#e8def8" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#e8def8')" title="Paars"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#e6e6e6" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#e6e6e6')" title="Grijs"></button>
+            </div>
+          </div>
         </div>
         <div id="deelplan-omschrijving" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbarVoor('deelplan-omschrijving')" onmouseup="updateRteToolbarVoor('deelplan-omschrijving')" style="min-height:70px" data-placeholder="Omschrijving (optioneel)"></div>
         <div style="display:flex;justify-content:flex-end;margin-top:10px">
@@ -116,6 +132,22 @@
               <button type="button" class="rte-kleur-vak" style="background:#c8855a" onmousedown="event.preventDefault()" onclick="rteKleurKies('einddoel-tekst','#c8855a')" title="Oranje"></button>
               <button type="button" class="rte-kleur-vak" style="background:#7d5ba6" onmousedown="event.preventDefault()" onclick="rteKleurKies('einddoel-tekst','#7d5ba6')" title="Paars"></button>
               <button type="button" class="rte-kleur-vak" style="background:#6b6b6b" onmousedown="event.preventDefault()" onclick="rteKleurKies('einddoel-tekst','#6b6b6b')" title="Grijs"></button>
+            </div>
+          </div>
+          <div class="rte-kleur-wrap">
+            <button type="button" class="rte-btn rte-btn-kleur rte-btn-achtergrond" onmousedown="event.preventDefault()" onclick="rteAchtergrondToggle('einddoel-tekst')" title="Achtergrondkleur">
+              <span>Abc</span>
+              <span class="rte-kleur-streep rte-kleur-streep-leeg" id="rte-achtergrond-streep-einddoel-tekst"></span>
+            </button>
+            <div class="rte-kleur-dropdown" id="rte-achtergrond-dropdown-einddoel-tekst" style="display:none">
+              <button type="button" class="rte-kleur-vak" style="background:repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0/8px 8px" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','transparent')" title="Geen"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fff3b0" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#fff3b0')" title="Geel"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#d7f0df" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#d7f0df')" title="Groen"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#d7e8f7" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#d7e8f7')" title="Blauw"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fbdde4" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#fbdde4')" title="Roze"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#fde3cf" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#fde3cf')" title="Oranje"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#e8def8" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#e8def8')" title="Paars"></button>
+              <button type="button" class="rte-kleur-vak" style="background:#e6e6e6" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#e6e6e6')" title="Grijs"></button>
             </div>
           </div>
         </div>
@@ -172,8 +204,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=29"></script>
-<script src="js/auth.js?v=29"></script>
-<script src="js/app.js?v=29"></script>
+<script src="js/supabase-config.js?v=30"></script>
+<script src="js/auth.js?v=30"></script>
+<script src="js/app.js?v=30"></script>
 </body>
 </html>

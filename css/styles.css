@@ -61,6 +61,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(-
 .rte-kleur-dropdown { position: absolute; top: calc(100% + 4px); left: 0; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--white); border: 1px solid var(--sand-dark); border-radius: 10px; padding: 10px; box-shadow: var(--shadow); }
 .rte-kleur-vak { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--sand-dark); cursor: pointer; padding: 0; }
 .rte-kleur-vak:hover { transform: scale(1.1); }
+.rte-btn-achtergrond span:first-child { font-size: 10px; font-weight: 700; }
+.rte-kleur-streep-leeg { background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0/8px 8px; }
 
 /* ===== BUTTONS ===== */
 .btn-primary { background: var(--sage); color: var(--white); border: none; padding: 13px 24px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; width: 100%; }

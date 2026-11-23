@@ -154,6 +154,33 @@ function rteKleurKies(veldId, kleur) {
   if (dropdown) dropdown.style.display = 'none';
   updateRteToolbarVoor(veldId);
 }
+// Achtergrondkleur voor tekst, zelfde bediening als de tekstkleur hierboven.
+function rteAchtergrondToggle(veldId) {
+  const dropdown = document.getElementById('rte-achtergrond-dropdown-' + veldId);
+  if (!dropdown) return;
+  const openNu = dropdown.style.display === 'grid';
+  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+  dropdown.style.display = openNu ? 'none' : 'grid';
+}
+function rteAchtergrondKies(veldId, kleur) {
+  const veld = document.getElementById(veldId);
+  if (veld) {
+    veld.focus();
+    try {
+      document.execCommand('hiliteColor', false, kleur);
+    } catch (e) {
+      document.execCommand('backColor', false, kleur);
+    }
+  }
+  const dropdown = document.getElementById('rte-achtergrond-dropdown-' + veldId);
+  if (dropdown) dropdown.style.display = 'none';
+  const streep = document.getElementById('rte-achtergrond-streep-' + veldId);
+  if (streep) {
+    if (kleur === 'transparent') { streep.style.background = ''; streep.classList.add('rte-kleur-streep-leeg'); }
+    else { streep.style.background = kleur; streep.classList.remove('rte-kleur-streep-leeg'); }
+  }
+  updateRteToolbarVoor(veldId);
+}
 // Klik buiten een open kleurenpalet sluit het weer.
 document.addEventListener('click', function (e) {
   if (e.target.closest('.rte-kleur-wrap')) return;
@@ -176,6 +203,27 @@ function rteKleurHtml(veldId) {
           <span class="rte-kleur-streep" id="rte-kleur-streep-${veldId}" style="background:#2a2a2a"></span>
         </button>
         <div class="rte-kleur-dropdown" id="rte-kleur-dropdown-${veldId}" style="display:none">${vakjes}</div>
+      </div>`;
+}
+// Herbruikbare HTML voor de achtergrondkleur-knop + palet.
+function rteAchtergrondHtml(veldId) {
+  const kleuren = [
+    ['transparent', 'Geen'], ['#fff3b0', 'Geel'], ['#d7f0df', 'Groen'], ['#d7e8f7', 'Blauw'],
+    ['#fbdde4', 'Roze'], ['#fde3cf', 'Oranje'], ['#e8def8', 'Paars'], ['#e6e6e6', 'Grijs']
+  ];
+  const vakjes = kleuren.map(function (k) {
+    const stijl = k[0] === 'transparent'
+      ? 'background:repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0/8px 8px'
+      : 'background:' + k[0];
+    return `<button type="button" class="rte-kleur-vak" style="${stijl}" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('${veldId}','${k[0]}')" title="${k[1]}"></button>`;
+  }).join('');
+  return `
+      <div class="rte-kleur-wrap">
+        <button type="button" class="rte-btn rte-btn-kleur rte-btn-achtergrond" onmousedown="event.preventDefault()" onclick="rteAchtergrondToggle('${veldId}')" title="Achtergrondkleur">
+          <span>Abc</span>
+          <span class="rte-kleur-streep rte-kleur-streep-leeg" id="rte-achtergrond-streep-${veldId}"></span>
+        </button>
+        <div class="rte-kleur-dropdown" id="rte-achtergrond-dropdown-${veldId}" style="display:none">${vakjes}</div>
       </div>`;
 }
 
@@ -209,6 +257,7 @@ function bewerkDeelplanHtml(d) {
         <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','bold')" title="Vet"><b>V</b></button>
         <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','italic')" title="Schuin"><i>S</i></button>
         ${rteKleurHtml(veldId)}
+        ${rteAchtergrondHtml(veldId)}
       </div>
       <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" oninput="autoSaveDeelplan('${d.id}')" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
