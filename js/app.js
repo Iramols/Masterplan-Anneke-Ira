@@ -53,7 +53,7 @@ async function initApp() {
     setInterval(function () {
       // Niet verversen terwijl iemand middenin een bewerking of invoer zit --
       // anders verdwijnt onopgeslagen tekst zomaar.
-      if (bewerkActieId || bewerkDeelplanId) return;
+      if (bewerkActieId) return;
       const actief = document.activeElement;
       if (actief && (['INPUT', 'TEXTAREA', 'SELECT'].includes(actief.tagName) || actief.isContentEditable)) return;
       ververDataStil();
@@ -228,31 +228,26 @@ function rteAchtergrondHtml(veldId) {
 }
 
 // ===== DEELPLANNEN =====
-let bewerkDeelplanId = null;
+// Titel en omschrijving staan altijd direct open om in te typen (geen aparte
+// bewerk-modus meer) -- scheelt een potlood-klik en een Klaar-knop.
 function renderDeelplannen() {
   const lijst = document.getElementById('deelplan-lijst');
   const items = state.deelplannen.items || [];
   document.getElementById('deelplan-leeg').style.display = items.length ? 'none' : '';
-  lijst.innerHTML = items.map((d, i) => d.id === bewerkDeelplanId ? bewerkDeelplanHtml(d) : `
-    <div class="deelplan-item">
-      <div class="deelplan-header">
-        <div class="deelplan-titel">${escapeHtml(d.titel || '')}</div>
-        <span style="display:flex;gap:6px;flex-shrink:0">
-          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', -1)" title="Omhoog" ${i === 0 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMHOOG}</button>
-          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', 1)" title="Omlaag" ${i === items.length - 1 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMLAAG}</button>
-          <button class="actie-del" onclick="bewerkDeelplan('${d.id}')" title="Bewerken">${ICOON_POTLOOD}</button>
-          <button class="actie-del" onclick="verwijderDeelplan('${d.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
-        </span>
-      </div>
-      ${d.omschrijving ? `<div class="item-tekst">${d.omschrijving}</div>` : ''}
-    </div>
-  `).join('');
+  lijst.innerHTML = items.map((d, i) => deelplanItemHtml(d, i, items.length)).join('');
 }
-function bewerkDeelplanHtml(d) {
+function deelplanItemHtml(d, i, aantal) {
   const veldId = 'de-omschrijving-' + d.id;
   return `
     <div class="deelplan-item">
-      <input id="de-titel-${d.id}" value="${escapeHtml(d.titel || '')}" oninput="autoSaveDeelplan('${d.id}')" style="width:100%;margin-bottom:8px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600">
+      <div class="deelplan-header">
+        <input id="de-titel-${d.id}" value="${escapeHtml(d.titel || '')}" oninput="autoSaveDeelplan('${d.id}')" style="flex:1;margin-right:10px;padding:9px 12px;border:1.5px solid var(--sand-dark);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600">
+        <span style="display:flex;gap:6px;flex-shrink:0">
+          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', -1)" title="Omhoog" ${i === 0 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMHOOG}</button>
+          <button class="actie-del" onclick="verplaatsDeelplan('${d.id}', 1)" title="Omlaag" ${i === aantal - 1 ? 'disabled style="opacity:.25;cursor:default"' : ''}>${ICOON_OMLAAG}</button>
+          <button class="actie-del" onclick="verwijderDeelplan('${d.id}')" title="Verwijderen">${ICOON_PRULLENBAK}</button>
+        </span>
+      </div>
       <div class="rte-toolbar" data-voor="${veldId}">
         <button type="button" class="rte-btn" data-cmd="bold" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','bold')" title="Vet"><b>V</b></button>
         <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','italic')" title="Schuin"><i>S</i></button>
@@ -260,15 +255,12 @@ function bewerkDeelplanHtml(d) {
         ${rteAchtergrondHtml(veldId)}
       </div>
       <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" oninput="autoSaveDeelplan('${d.id}')" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <div style="margin-top:10px">
         <span id="de-status-${d.id}" style="font-size:12px;color:var(--muted)">Wordt automatisch opgeslagen terwijl je typt.</span>
-        <button class="btn-sm" onclick="sluitBewerkDeelplan()">Klaar</button>
       </div>
     </div>
   `;
 }
-function bewerkDeelplan(id) { bewerkDeelplanId = id; renderDeelplannen(); }
-function sluitBewerkDeelplan() { bewerkDeelplanId = null; renderDeelplannen(); }
 // Automatisch opslaan i.p.v. Opslaan/Annuleren-knoppen -- voorkomt dat
 // wijzigingen verloren gaan als je wegklikt vóór je zelf zou opslaan.
 // Herrendert bewust niets (zou de cursor resetten), alleen het statustekstje.
