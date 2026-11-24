@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Masterplan Anneke & Ira</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=24">
+<link rel="stylesheet" href="css/styles.css?v=25">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,12 +45,12 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v31)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v32)</button>
     <nav class="nav">
-      <button class="nav-btn active" data-view="deelplannen" onclick="gaNaar('deelplannen')">Tussentijdse doelen 2027-2029</button>
-      <button class="nav-btn" data-view="einddoel" onclick="gaNaar('einddoel')">Doelen 2030</button>
-      <button class="nav-btn" data-view="acties" onclick="gaNaar('acties')">Acties</button>
-      <button class="nav-btn" data-view="dashboard" onclick="gaNaar('dashboard')">Dashboard</button>
+      <button class="nav-btn active" data-view="deelplannen" onclick="navKlik(this,'deelplannen', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="deelplannen" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Tussentijdse doelen 2027-2029</span></button>
+      <button class="nav-btn" data-view="einddoel" onclick="navKlik(this,'einddoel', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="einddoel" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Doelen 2030</span></button>
+      <button class="nav-btn" data-view="acties" onclick="navKlik(this,'acties', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="acties" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Acties</span></button>
+      <button class="nav-btn" data-view="dashboard" onclick="navKlik(this,'dashboard', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="dashboard" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Dashboard</span></button>
     </nav>
     <button class="btn-sm" onclick="doLogout()">🚪 Uit</button>
   </header>
@@ -204,8 +204,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=31"></script>
-<script src="js/auth.js?v=31"></script>
-<script src="js/app.js?v=31"></script>
+<script src="js/supabase-config.js?v=32"></script>
+<script src="js/auth.js?v=32"></script>
+<script src="js/app.js?v=32"></script>
 </body>
 </html>

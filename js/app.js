@@ -65,9 +65,68 @@ async function ververDataStil() {
   state.einddoel = await laadData('einddoel', { tekst: '' });
   state.deelplannen = await laadData('deelplannen', { items: [] });
   state.acties = await laadData('acties', { items: [] });
+  state.tabnamen = await laadData('tabnamen', {});
   renderEinddoel();
   renderDeelplannen();
   renderActies();
+  toepassenTabnamen();
+}
+
+// Tabnamen zijn direct aanpasbaar: klik op de AL ACTIEVE tab om te gaan
+// typen (klikken op een niet-actieve tab wisselt gewoon van tabblad, zoals
+// altijd). Geen potlood of knop nodig -- typen en de naam wordt automatisch
+// opgeslagen, net als de rest van de site.
+function navKlik(btn, view, span) {
+  if (span.isContentEditable) return;
+  if (btn.classList.contains('active')) {
+    beginTabNaamBewerken(span);
+  } else {
+    gaNaar(view);
+  }
+}
+function beginTabNaamBewerken(span) {
+  span.contentEditable = 'true';
+  span.spellcheck = false;
+  span.focus();
+  document.execCommand('selectAll');
+}
+function tabNaamKeydown(e) {
+  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+  else if (e.key === 'Escape') {
+    e.preventDefault();
+    e.target.textContent = (state.tabnamen && state.tabnamen[e.target.dataset.tab]) || e.target.textContent;
+    e.target.blur();
+  }
+}
+function tabNaamBlur(span) {
+  span.contentEditable = 'false';
+  const naam = span.textContent.replace(/\s+/g, ' ').trim();
+  if (!naam) { span.textContent = (state.tabnamen && state.tabnamen[span.dataset.tab]) || span.textContent; return; }
+  span.textContent = naam;
+  tabNaamInput(span);
+}
+let tabNaamAutoSaveTimer = null;
+function tabNaamInput(span) {
+  clearTimeout(tabNaamAutoSaveTimer);
+  tabNaamAutoSaveTimer = setTimeout(async function () {
+    const tab = span.dataset.tab;
+    const naam = span.textContent.replace(/\s+/g, ' ').trim();
+    if (!naam) return;
+    state.tabnamen = state.tabnamen || {};
+    state.tabnamen[tab] = naam;
+    await bewaarData('tabnamen', state.tabnamen);
+    const titelEl = document.querySelector('#view-' + tab + ' .card-title');
+    if (titelEl) titelEl.textContent = naam;
+  }, 800);
+}
+function toepassenTabnamen() {
+  const namen = state.tabnamen || {};
+  Object.keys(namen).forEach(function (tab) {
+    const span = document.querySelector('.nav-label[data-tab="' + tab + '"]');
+    if (span && !span.isContentEditable) span.textContent = namen[tab];
+    const titelEl = document.querySelector('#view-' + tab + ' .card-title');
+    if (titelEl) titelEl.textContent = namen[tab];
+  });
 }
 
 function gaNaar(view) {
