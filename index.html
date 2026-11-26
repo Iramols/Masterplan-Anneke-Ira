@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Masterplan Anneke & Ira</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=25">
+<link rel="stylesheet" href="css/styles.css?v=26">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -45,7 +45,7 @@
   <header class="header">
     <div class="logo">MASTERPLAN ANNEKE &amp; IRA<span>HealthPotential — leefstijlbedrijf</span></div>
     <!-- Versienummer hier moet elke keer meeveranderen met de ?v=N hieronder, bij elke wijziging aan index.html/css/js. -->
-    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v32)</button>
+    <button class="btn-ververs" onclick="verversNu()" title="Pagina verversen (haalt de laatste versie op)">Ververs (v33)</button>
     <nav class="nav">
       <button class="nav-btn active" data-view="deelplannen" onclick="navKlik(this,'deelplannen', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="deelplannen" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Tussentijdse doelen 2027-2029</span></button>
       <button class="nav-btn" data-view="einddoel" onclick="navKlik(this,'einddoel', this.querySelector('.nav-label'))"><span class="nav-label" data-tab="einddoel" oninput="tabNaamInput(this)" onkeydown="tabNaamKeydown(event)" onblur="tabNaamBlur(this)">Doelen 2030</span></button>
@@ -102,6 +102,15 @@
               <button type="button" class="rte-kleur-vak" style="background:#e6e6e6" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('deelplan-omschrijving','#e6e6e6')" title="Grijs"></button>
             </div>
           </div>
+          <div class="rte-grootte-wrap" style="position:relative;display:inline-block">
+            <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="rteGrootteToggle('deelplan-omschrijving')" title="Lettergrootte">Aa</button>
+            <div class="rte-grootte-dropdown" id="rte-grootte-dropdown-deelplan-omschrijving" style="display:none">
+              <button type="button" class="rte-grootte-vak" style="font-size:12px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('deelplan-omschrijving',12)">Klein</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:14px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('deelplan-omschrijving',14)">Standaard</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:18px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('deelplan-omschrijving',18)">Groot</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:24px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('deelplan-omschrijving',24)">Extra groot</button>
+            </div>
+          </div>
         </div>
         <div id="deelplan-omschrijving" class="rte-veld" contenteditable="true" onkeyup="updateRteToolbarVoor('deelplan-omschrijving')" onmouseup="updateRteToolbarVoor('deelplan-omschrijving')" style="min-height:70px" data-placeholder="Omschrijving (optioneel)"></div>
         <div style="display:flex;justify-content:flex-end;margin-top:10px">
@@ -148,6 +157,15 @@
               <button type="button" class="rte-kleur-vak" style="background:#fde3cf" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#fde3cf')" title="Oranje"></button>
               <button type="button" class="rte-kleur-vak" style="background:#e8def8" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#e8def8')" title="Paars"></button>
               <button type="button" class="rte-kleur-vak" style="background:#e6e6e6" onmousedown="event.preventDefault()" onclick="rteAchtergrondKies('einddoel-tekst','#e6e6e6')" title="Grijs"></button>
+            </div>
+          </div>
+          <div class="rte-grootte-wrap" style="position:relative;display:inline-block">
+            <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="rteGrootteToggle('einddoel-tekst')" title="Lettergrootte">Aa</button>
+            <div class="rte-grootte-dropdown" id="rte-grootte-dropdown-einddoel-tekst" style="display:none">
+              <button type="button" class="rte-grootte-vak" style="font-size:12px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('einddoel-tekst',12)">Klein</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:14px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('einddoel-tekst',14)">Standaard</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:18px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('einddoel-tekst',18)">Groot</button>
+              <button type="button" class="rte-grootte-vak" style="font-size:24px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('einddoel-tekst',24)">Extra groot</button>
             </div>
           </div>
         </div>
@@ -204,8 +222,8 @@
   </main>
 </div>
 
-<script src="js/supabase-config.js?v=32"></script>
-<script src="js/auth.js?v=32"></script>
-<script src="js/app.js?v=32"></script>
+<script src="js/supabase-config.js?v=33"></script>
+<script src="js/auth.js?v=33"></script>
+<script src="js/app.js?v=33"></script>
 </body>
 </html>

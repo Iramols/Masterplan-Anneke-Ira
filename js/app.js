@@ -200,7 +200,7 @@ function rteKleurToggle(veldId) {
   const dropdown = document.getElementById('rte-kleur-dropdown-' + veldId);
   if (!dropdown) return;
   const openNu = dropdown.style.display === 'grid';
-  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+  sluitAlleRteDropdowns();
   dropdown.style.display = openNu ? 'none' : 'grid';
 }
 function rteKleurKies(veldId, kleur) {
@@ -218,7 +218,7 @@ function rteAchtergrondToggle(veldId) {
   const dropdown = document.getElementById('rte-achtergrond-dropdown-' + veldId);
   if (!dropdown) return;
   const openNu = dropdown.style.display === 'grid';
-  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+  sluitAlleRteDropdowns();
   dropdown.style.display = openNu ? 'none' : 'grid';
 }
 function rteAchtergrondKies(veldId, kleur) {
@@ -240,10 +240,42 @@ function rteAchtergrondKies(veldId, kleur) {
   }
   updateRteToolbarVoor(veldId);
 }
-// Klik buiten een open kleurenpalet sluit het weer.
+// Lettergrootte voor tekst -- zelfde knop-in-knop bediening, maar met een
+// lijstje in plaats van kleurvakjes. execCommand('fontSize') kent alleen de
+// oude HTML-maten 1-7; door achteraf de font[size="7"]-tags te vervangen
+// door een span met een eigen pixelgrootte krijgen we elke gewenste maat.
+function rteGrootteToggle(veldId) {
+  const dropdown = document.getElementById('rte-grootte-dropdown-' + veldId);
+  if (!dropdown) return;
+  const openNu = dropdown.style.display === 'flex';
+  sluitAlleRteDropdowns();
+  dropdown.style.display = openNu ? 'none' : 'flex';
+}
+function rteGrootteKies(veldId, px) {
+  const veld = document.getElementById(veldId);
+  if (veld) {
+    veld.focus();
+    document.execCommand('fontSize', false, '7');
+    veld.querySelectorAll('font[size="7"]').forEach(function (el) {
+      const span = document.createElement('span');
+      span.style.fontSize = px + 'px';
+      while (el.firstChild) span.appendChild(el.firstChild);
+      el.parentNode.replaceChild(span, el);
+    });
+  }
+  const dropdown = document.getElementById('rte-grootte-dropdown-' + veldId);
+  if (dropdown) dropdown.style.display = 'none';
+  updateRteToolbarVoor(veldId);
+}
+// Sluit alle open paletten/lijstjes (kleur, achtergrond, grootte) -- gebruikt
+// bij het openen van een ander palet en bij een klik erbuiten.
+function sluitAlleRteDropdowns() {
+  document.querySelectorAll('.rte-kleur-dropdown, .rte-grootte-dropdown').forEach(function (el) { el.style.display = 'none'; });
+}
+// Klik buiten een open palet/lijstje sluit het weer.
 document.addEventListener('click', function (e) {
-  if (e.target.closest('.rte-kleur-wrap')) return;
-  document.querySelectorAll('.rte-kleur-dropdown').forEach(function (el) { el.style.display = 'none'; });
+  if (e.target.closest('.rte-kleur-wrap') || e.target.closest('.rte-grootte-wrap')) return;
+  sluitAlleRteDropdowns();
 });
 // Herbruikbare HTML voor de A-knop + het kleurenpalet, voor dynamisch
 // gegenereerde toolbars (bijv. bij het bewerken van een deelplan).
@@ -285,6 +317,18 @@ function rteAchtergrondHtml(veldId) {
         <div class="rte-kleur-dropdown" id="rte-achtergrond-dropdown-${veldId}" style="display:none">${vakjes}</div>
       </div>`;
 }
+// Herbruikbare HTML voor de lettergrootte-knop + lijstje.
+function rteGrootteHtml(veldId) {
+  const maten = [['12', 'Klein'], ['14', 'Standaard'], ['18', 'Groot'], ['24', 'Extra groot']];
+  const regels = maten.map(function (m) {
+    return `<button type="button" class="rte-grootte-vak" style="font-size:${m[0]}px" onmousedown="event.preventDefault()" onclick="rteGrootteKies('${veldId}',${m[0]})">${m[1]}</button>`;
+  }).join('');
+  return `
+      <div class="rte-grootte-wrap" style="position:relative;display:inline-block">
+        <button type="button" class="rte-btn" onmousedown="event.preventDefault()" onclick="rteGrootteToggle('${veldId}')" title="Lettergrootte">Aa</button>
+        <div class="rte-grootte-dropdown" id="rte-grootte-dropdown-${veldId}" style="display:none">${regels}</div>
+      </div>`;
+}
 
 // ===== DEELPLANNEN =====
 // Titel en omschrijving staan altijd direct open om in te typen (geen aparte
@@ -312,6 +356,7 @@ function deelplanItemHtml(d, i, aantal) {
         <button type="button" class="rte-btn" data-cmd="italic" onmousedown="event.preventDefault()" onclick="rteCmd('${veldId}','italic')" title="Schuin"><i>S</i></button>
         ${rteKleurHtml(veldId)}
         ${rteAchtergrondHtml(veldId)}
+        ${rteGrootteHtml(veldId)}
       </div>
       <div id="${veldId}" class="rte-veld" contenteditable="true" style="min-height:70px" oninput="autoSaveDeelplan('${d.id}')" onkeyup="updateRteToolbarVoor('${veldId}')" onmouseup="updateRteToolbarVoor('${veldId}')">${d.omschrijving || ''}</div>
       <div style="margin-top:10px">
